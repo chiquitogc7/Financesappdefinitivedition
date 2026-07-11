@@ -22,13 +22,13 @@
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyC3hRrGdLFWUmN6twbG6qM73i8brVdOyyk",
-      authDomain: "financesapp26-629f0.firebaseapp.com",
-      databaseURL: "https://financesapp26-629f0-default-rtdb.firebaseio.com",
-      projectId: "financesapp26-629f0",
-      storageBucket: "financesapp26-629f0.firebasestorage.app",
-      messagingSenderId: "450108431367",
-      appId: "1:450108431367:web:377c9e2daf48dfac5f5ea2"
+      apiKey: "AIzaSyAkUPETgZTo2pkec3lOqx8NXSwkIpaM9Tg",
+      authDomain: "financesapp202000.firebaseapp.com",
+      databaseURL: "https://financesapp202000-default-rtdb.firebaseio.com",
+      projectId: "financesapp202000",
+      storageBucket: "financesapp202000.firebasestorage.app",
+      messagingSenderId: "482223251544",
+      appId: "1:482223251544:web:161f7287db7008a13e6a2d"
     };
 
     const app     = initializeApp(firebaseConfig);
