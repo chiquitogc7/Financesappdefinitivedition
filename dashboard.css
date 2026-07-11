@@ -1,0 +1,739 @@
+/* ==============================================================
+   FINANCESAPP — DASHBOARD.CSS
+Cards de resumo, insights, graficos, calendario, ciclo financeiro,
+explicador de saldo, resumo do mes e widgets personalizaveis do Dashboard.
+   ============================================================== */
+
+
+/* ------------------------------------------------------------
+   ============ CARDS ============
+   ------------------------------------------------------------ */
+
+.cards-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+.card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px 24px;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+  animation: cardRise 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes cardRise {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card:hover { transform: translateY(-3px); border-color: var(--text3); }
+
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.card-income::before  { background: linear-gradient(90deg, var(--green), #2abf7a); }
+.card-expense::before { background: linear-gradient(90deg, var(--red), #c04040); }
+.card-balance::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.card-parcel::before  { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+
+.card-label { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.card-value { font-family: var(--font-head); font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.card-hint  { font-size: 12px; color: var(--text3); }
+
+
+/* ------------------------------------------------------------
+   ============ INSIGHTS ============
+   ------------------------------------------------------------ */
+
+.insights-wrapper {
+  margin-bottom: 24px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.insights-titulo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-head); font-size: 13px; font-weight: 700;
+  color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.insights-box { display: flex; flex-direction: column; gap: 8px; }
+
+.insight-chip {
+  font-size: 13px; padding: 10px 14px; border-radius: 10px;
+  border-left: 3px solid transparent; line-height: 1.5;
+}
+
+.insight-ok {
+  background: rgba(61,214,140,0.08);
+  border-color: var(--green);
+  color: #7eedd8;
+}
+
+.insight-warn {
+  background: rgba(240,192,64,0.08);
+  border-color: var(--accent);
+  color: #e8cc78;
+}
+
+.insight-danger {
+  background: rgba(224,84,84,0.08);
+  border-color: var(--red);
+  color: #e89090;
+}
+
+
+/* ------------------------------------------------------------
+   ============ CHARTS ============
+   ------------------------------------------------------------ */
+
+.charts-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+
+.chart-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  transition: border-color 0.2s;
+}
+.chart-box:hover { border-color: var(--text3); }
+.chart-box h3 { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+
+/* ------------------------------------------------------------
+   ============ CALENDÁRIO ============
+   ------------------------------------------------------------ */
+
+.cal-wrapper { max-width: 900px; }
+
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; }
+
+.cal-mes-titulo { font-family: var(--font-head); font-size: 24px; font-weight: 800; color: var(--text); flex: 1; text-align: center; }
+
+.cal-nav-btn {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text2); cursor: pointer;
+  padding: 8px 12px; display: flex; align-items: center;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.cal-nav-btn svg { width: 20px; height: 20px; fill: currentColor; }
+.cal-nav-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,0.08); }
+
+.cal-resumo-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+
+.cal-resumo-chip {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 18px;
+  display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 140px;
+}
+.cal-resumo-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+.cal-resumo-val { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--accent); }
+
+.cal-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+.cal-grid-header span { text-align: center; font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; padding: 6px 0; }
+
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+.cal-cell {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; min-height: 90px; padding: 8px;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  position: relative; display: flex; flex-direction: column; gap: 4px;
+  animation: cellFadeIn 0.3s ease both;
+}
+
+@keyframes cellFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.cal-cell:hover { border-color: var(--accent); background: rgba(240,192,64,0.04); transform: translateY(-2px); }
+.cal-cell.vazio { background: transparent; border-color: transparent; cursor: default; pointer-events: none; }
+.cal-cell.vazio:hover { transform: none; }
+
+.cal-cell.hoje { border-color: var(--accent); background: rgba(240,192,64,0.06); }
+.cal-cell.hoje .cal-cell-num { background: var(--accent); color: #0d0f14; border-radius: 6px; padding: 1px 5px; }
+.cal-cell.tem-gasto { border-color: rgba(240,192,64,0.3); }
+.cal-cell.tem-pagamento { border-color: rgba(61,214,140,0.3); }
+.cal-cell.selecionado { border-color: var(--accent); background: rgba(240,192,64,0.1); }
+
+.cal-cell-num { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text2); line-height: 1; display: inline-block; width: fit-content; }
+.cal-cell-total { font-family: var(--font-head); font-size: 12px; font-weight: 700; color: var(--red); margin-top: 2px; }
+.cal-cell-items { display: flex; flex-direction: column; gap: 2px; overflow: hidden; flex: 1; }
+
+.cal-dot {
+  font-size: 10px; color: var(--text2); background: var(--bg3);
+  border-radius: 4px; padding: 2px 5px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; line-height: 1.4;
+}
+.cal-dot.parcela-dot { background: rgba(240,192,64,0.15); color: var(--accent); }
+.cal-dot.gasto-dot   { background: rgba(224,84,84,0.12); color: #e08080; }
+.cal-dot.pag-dot     { background: rgba(61,214,140,0.12); color: var(--green); }
+.cal-dot.mais        { color: var(--text3); background: none; font-style: italic; }
+
+.cal-cell-vence {
+  position: absolute; top: 4px; right: 4px;
+  background: var(--accent); color: #0d0f14;
+  font-size: 9px; font-weight: 800; border-radius: 4px;
+  padding: 1px 4px; font-family: var(--font-head);
+}
+
+.cal-cell-pago {
+  position: absolute; top: 4px; right: 4px;
+  background: var(--green); color: #0d0f14;
+  font-size: 10px; font-weight: 800; border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.cal-detalhe {
+  margin-top: 20px; background: var(--bg2); border: 1px solid var(--accent);
+  border-radius: var(--radius); overflow: hidden; animation: slideUp 0.2s ease;
+}
+
+.cal-detalhe-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  background: rgba(240,192,64,0.06);
+}
+.cal-detalhe-header span { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--accent); }
+
+.cal-detalhe-close {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text3); cursor: pointer; font-size: 13px; padding: 4px 8px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.cal-detalhe-close:hover { border-color: var(--red); color: var(--red); }
+
+.cal-detalhe-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+.cal-detalhe-item {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px;
+}
+.cal-detalhe-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.cal-detalhe-info { flex: 1; }
+.cal-detalhe-nome { font-weight: 600; font-size: 14px; color: var(--text); }
+.cal-detalhe-sub  { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.5; }
+
+.cal-detalhe-valor { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--red); text-align: right; flex-shrink: 0; }
+.cal-detalhe-valor.parcela { color: var(--accent); }
+
+.cal-detalhe-badge { display: inline-block; font-size: 10px; font-weight: 700; border-radius: 4px; padding: 2px 6px; margin-top: 4px; font-family: var(--font-head); }
+.badge-compra  { background: rgba(61,214,140,0.15); color: var(--green); }
+.badge-parcela { background: rgba(240,192,64,0.15); color: var(--accent); }
+.badge-vence   { background: rgba(224,84,84,0.15); color: var(--red); }
+
+
+/* ------------------------------------------------------------
+   ============ EXPLICADOR DE SALDO (melhoria 3) ============
+   ------------------------------------------------------------ */
+
+.explicador-wrapper {
+  background: var(--bg2);
+  border: 1px solid rgba(77,157,224,0.2);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+
+.explicador-header {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-head); font-size: 13px; font-weight: 700;
+  color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+
+.explicador-saldo-resumo {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 14px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.explicador-saldo-val {
+  font-family: var(--font-head); font-size: 28px; font-weight: 800;
+}
+.explicador-saldo-val.pos { color: var(--green); }
+.explicador-saldo-val.neg { color: var(--red); }
+
+.explicador-saldo-label { font-size: 12px; color: var(--text3); }
+
+.explicador-sub {
+  font-size: 12px; color: var(--text2); margin-bottom: 10px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+.explicador-linha {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; border-radius: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  font-size: 13px; color: var(--text2); margin-bottom: 6px;
+  transition: border-color 0.2s;
+}
+.explicador-linha:hover { border-color: var(--text3); }
+
+
+/* ------------------------------------------------------------
+   ============ CICLO FINANCEIRO (melhoria 1) ============
+   ------------------------------------------------------------ */
+
+.ciclo-wrapper {
+  background: var(--bg2);
+  border: 1px solid rgba(155,114,232,0.2);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+
+.ciclo-header {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-head); font-size: 13px; font-weight: 700;
+  color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 16px;
+}
+
+.ciclo-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+
+.ciclo-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px;
+}
+
+.ciclo-card-titulo {
+  font-size: 12px; font-weight: 700; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.ciclo-bar-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+}
+
+.ciclo-dia-num {
+  font-family: var(--font-head); font-size: 12px; font-weight: 700;
+  color: var(--text2); min-width: 46px; flex-shrink: 0;
+}
+
+.ciclo-bar-bg {
+  flex: 1; background: var(--bg); border-radius: 99px; height: 7px; overflow: hidden;
+}
+
+.ciclo-bar-fill {
+  height: 100%; border-radius: 99px; width: 0%;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ciclo-dia-val {
+  font-size: 11px; color: var(--text3); min-width: 70px; text-align: right; flex-shrink: 0;
+}
+
+.ciclo-card-alertas { background: var(--bg2); border-color: rgba(155,114,232,0.2); }
+
+
+/* ------------------------------------------------------------
+   RESUMO DO MES (melhoria 4)
+   ------------------------------------------------------------ */
+.resumo-mes-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 600; padding: 20px;
+  opacity: 0; transition: opacity 0.3s;
+}
+.resumo-mes-overlay.visible { opacity: 1; }
+
+.resumo-mes-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  width: 100%; max-width: 540px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.8);
+  position: relative; overflow: hidden;
+  animation: resumoPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes resumoPop {
+  from { opacity: 0; transform: scale(0.85) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.resumo-mes-confete {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 100%; pointer-events: none; z-index: 1; overflow: hidden;
+}
+
+.confete-particula {
+  position: absolute; top: -10px;
+  animation: confeteCair linear both;
+}
+@keyframes confeteCair {
+  from { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  to   { transform: translateY(600px) rotate(720deg); opacity: 0; }
+}
+
+.resumo-mes-header {
+  padding: 36px 32px 24px; text-align: center;
+  position: relative; z-index: 2;
+  background: linear-gradient(180deg, rgba(240,192,64,0.07) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+
+.resumo-mes-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+
+.resumo-mes-header h2 {
+  font-family: var(--font-head); font-size: 24px; font-weight: 800;
+  color: var(--text); margin-bottom: 6px;
+}
+.resumo-mes-header p { font-size: 14px; color: var(--text2); }
+
+.resumo-mes-cards {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; padding: 24px; position: relative; z-index: 2;
+}
+
+.resumo-mes-fechar {
+  display: block; width: calc(100% - 48px); margin: 0 24px 24px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; border-radius: 12px; color: #0d0f14;
+  cursor: pointer; font-family: var(--font-head); font-size: 15px;
+  font-weight: 700; padding: 14px; position: relative; z-index: 2;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.resumo-mes-fechar:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* Botão de resumo na topbar */
+.btn-resumo-mes {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(240,192,64,0.1);
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 10px; color: var(--accent);
+  cursor: pointer; font-family: var(--font-body); font-size: 13px;
+  font-weight: 600; padding: 10px 14px;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.btn-resumo-mes:hover { background: rgba(240,192,64,0.18); border-color: rgba(240,192,64,0.5); }
+
+/* Toast com botão de undo embutido */
+
+/* ------------------------------------------------------------
+   DASHBOARD PERSONALIZÁVEL — Widgets v1
+   ------------------------------------------------------------ */
+
+
+/* ── Botão Widgets na topbar ── */
+.btn-customizar-dash {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text2);
+  cursor: pointer; font-family: var(--font-body); font-size: 13px;
+  padding: 10px 14px;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.btn-customizar-dash:hover { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,0.06); }
+
+/* ── Área de widgets ── */
+.dashboard-widgets-area {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 0 24px;
+}
+
+.widgets-half-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+/* ── Widget modular ── */
+.widget-modular {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.widget-modular:hover { border-color: var(--text3); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+
+.widget-full  { width: 100%; }
+.widget-half  { min-height: 200px; }
+
+.widget-content { padding: 18px 20px; }
+
+.widget-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.widget-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
+.widget-total { font-family: var(--font-head); font-size: 16px; font-weight: 800; color: var(--accent); }
+.widget-link-btn {
+  background: none; border: none; color: var(--accent);
+  cursor: pointer; font-size: 12px; font-weight: 600;
+  font-family: var(--font-body); padding: 4px 8px;
+  transition: opacity 0.2s;
+}
+.widget-link-btn:hover { opacity: 0.75; }
+.widget-empty {
+  color: var(--text3); font-size: 13px; line-height: 1.7; text-align: center;
+  padding: 16px 0;
+}
+
+/* ── Widget Gastos da Semana ── */
+.semana-bars {
+  display: flex; align-items: flex-end; gap: 6px; height: 90px;
+}
+.semana-bar-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.semana-bar-wrap {
+  flex: 1; width: 100%; display: flex; align-items: flex-end;
+  background: var(--bg3); border-radius: 6px; overflow: hidden;
+  height: 60px;
+}
+.semana-bar-fill {
+  width: 100%; background: var(--accent);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0.75;
+}
+.semana-bar-fill.hoje { opacity: 1; box-shadow: 0 0 0 2px var(--accent); }
+.semana-bar-val {
+  font-size: 9px; color: var(--text3); font-weight: 600;
+  text-align: center; min-height: 12px;
+  font-family: var(--font-head);
+}
+.semana-bar-label {
+  font-size: 9px; color: var(--text3); text-align: center; line-height: 1.3;
+}
+.semana-bar-label.hoje { color: var(--accent); font-weight: 700; }
+.semana-bar-label span { display: block; font-size: 10px; font-weight: 600; }
+.semana-resumo { font-size: 11px; color: var(--text3); text-align: center; margin-top: 10px; }
+
+/* ── Widget Metas ── */
+.metas-widget-list { display: flex; flex-direction: column; gap: 12px; }
+.meta-widget-item { display: flex; flex-direction: column; gap: 5px; }
+.meta-widget-info { display: flex; justify-content: space-between; align-items: center; }
+.meta-widget-nome { font-size: 13px; font-weight: 600; color: var(--text); }
+.meta-widget-pct  { font-size: 12px; font-weight: 700; color: var(--accent); }
+.meta-widget-bar-bg { height: 6px; background: var(--bg3); border-radius: 99px; overflow: hidden; }
+.meta-widget-bar-fill { height: 100%; border-radius: 99px; transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.meta-widget-vals { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); }
+
+/* ── Widget Contas Futuras ── */
+.futuras-widget-list { display: flex; flex-direction: column; gap: 8px; }
+.futura-widget-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.futura-widget-item:hover { border-color: var(--accent); }
+.futura-widget-icon { font-size: 18px; flex-shrink: 0; }
+.futura-widget-info { flex: 1; min-width: 0; }
+.futura-widget-nome { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.futura-widget-data { font-size: 11px; color: var(--text3); }
+.futura-widget-valor { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--red); flex-shrink: 0; }
+
+/* ── Painel de Customização ── */
+.customizar-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 500; padding: 20px;
+  opacity: 0; transition: opacity 0.25s;
+}
+.customizar-overlay.visible { opacity: 1; }
+
+.customizar-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  width: 100%; max-width: 600px;
+  max-height: 85vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+  animation: confirmPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.customizar-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.customizar-header h3 {
+  font-family: var(--font-head); font-size: 18px; font-weight: 800; color: var(--text);
+  margin-bottom: 4px;
+}
+.customizar-header p { font-size: 13px; color: var(--text2); }
+.customizar-close {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text2);
+  cursor: pointer; font-size: 14px; padding: 6px 10px;
+  transition: background 0.2s;
+}
+.customizar-close:hover { background: var(--border); }
+
+.customizar-body { flex: 1; overflow-y: auto; padding: 20px 28px; }
+
+.widget-grid {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.widget-toggle-card {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+.widget-toggle-card.ativo { border-color: var(--accent); background: rgba(240,192,64,0.04); }
+.widget-toggle-card:hover { border-color: var(--text3); }
+.widget-toggle-card.ativo:hover { border-color: var(--accent); }
+
+.widget-toggle-info { flex: 1; min-width: 0; }
+.widget-toggle-nome { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.widget-toggle-desc { font-size: 12px; color: var(--text2); }
+.widget-size-badge {
+  display: inline-block; margin-top: 5px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 2px 8px;
+  font-size: 11px; color: var(--text3); font-weight: 600;
+}
+
+.widget-toggle-switch {
+  width: 44px; height: 26px; border-radius: 99px;
+  background: var(--bg); border: 2px solid var(--border);
+  flex-shrink: 0; position: relative;
+  transition: background 0.25s, border-color 0.25s;
+}
+.widget-toggle-switch.on { background: var(--accent); border-color: var(--accent); }
+.widget-toggle-knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--text3); transition: left 0.2s, background 0.2s;
+}
+.widget-toggle-switch.on .widget-toggle-knob { left: 21px; background: #fff; }
+
+.customizar-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Rótulos de seção nos temas ── */
+.cfg-theme-section-label {
+  grid-column: 1 / -1;
+  font-size: 11px; font-weight: 700;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 4px 0 2px;
+}
+
+/* ── Correção topbar (inserir botão widgets sem quebrar layout) ── */
+
+
+/* ══════════════════════════════════════════════════════════
+   ANIMAÇÕES APRIMORADAS — Mobile nav dropdown
+   ══════════════════════════════════════════════════════════ */
+
+/* Dropdown items entram em cascata */
+.mobile-nav-dropdown.open .mobile-nav-item {
+  animation: navItemSlideIn 0.3s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(1) { animation-delay: 0.04s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(2) { animation-delay: 0.07s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(3) { animation-delay: 0.10s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(4) { animation-delay: 0.13s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(5) { animation-delay: 0.16s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(6) { animation-delay: 0.19s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(7) { animation-delay: 0.22s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(8) { animation-delay: 0.25s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(9) { animation-delay: 0.28s; }
+.mobile-nav-dropdown.open .mobile-nav-item:nth-child(10) { animation-delay: 0.31s; }
+
+@keyframes navItemSlideIn {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Hover melhorado nos itens do dropdown mobile */
+.mobile-nav-item {
+  position: relative;
+  overflow: hidden;
+}
+.mobile-nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  opacity: 0;
+  border-radius: 10px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: opacity 0.2s, transform 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+.mobile-nav-item:hover::before {
+  opacity: 0.07;
+  transform: scaleX(1);
+}
+
+/* Botão mobile nav — animação de spin ao abrir */
+.mobile-nav-btn {
+  transition: opacity 0.2s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s !important;
+}
+.mobile-nav-btn.nav-open {
+  transform: rotate(45deg) scale(0.95) !important;
+  box-shadow: 0 0 0 4px rgba(240,192,64,0.15);
+}
+.mobile-nav-btn:active { transform: scale(0.88) !important; }
+
+/* ══════════════════════════════════════════════════════════
+   EXCLUIR CONTA — estilo do botão na zona de perigo
+   ══════════════════════════════════════════════════════════ */
+.cfg-delete-account-btn {
+  position: relative;
+  overflow: hidden;
+}
+.cfg-delete-account-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+.cfg-delete-account-btn:hover::after {
+  transform: translateX(100%);
+}
+.cfg-delete-account-btn:hover {
+  background: rgba(220,38,38,0.2) !important;
+  border-color: rgba(220,38,38,0.7) !important;
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+}
+
+/* Login feedback: warning type */
+.login-feedback.warning {
+  color: #f0c040;
+  background: rgba(240,192,64,0.08);
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.insights-bloqueado {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 6px; padding: 28px 16px;
+  color: var(--text2);
+}
+.insights-bloqueado-icone { font-size: 28px; opacity: 0.7; margin-bottom: 4px; }
+.insights-bloqueado p { margin: 0; font-size: 13.5px; line-height: 1.5; max-width: 340px; }
+.insights-bloqueado-falta { color: var(--accent); font-weight: 600; font-size: 13px; }
+
+/* ------------------------------------------------------------
+   7) PARCELADOS PAGOS — botão-resumo na tela principal
+   ------------------------------------------------------------ */

@@ -1,0 +1,494 @@
+/* ==============================================================
+   FINANCESAPP — RESPONSIVE.CSS
+Todas as media queries do projeto, centralizadas aqui.
+Carregar SEMPRE por ultimo.
+   ============================================================== */
+
+
+/* ------------------------------------------------------------
+   ============ RESPONSIVE ============
+   ------------------------------------------------------------ */
+
+/* Responsividade completa em style_responsive.css */
+/* Mantidos apenas breakpoints básicos de fallback */
+
+
+/* ------------------------------------------------------------
+   [style.css] ============ RESPONSIVE ============
+   ------------------------------------------------------------ */
+@media (max-width: 1200px) {
+  .charts-row { grid-template-columns: 1fr; }
+  .pagamentos-wrapper { grid-template-columns: 1fr; }
+  .cartoes-wrapper { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   [style.css] ============ ADIANTAR PARCELAS — NOVO UI ============
+   ------------------------------------------------------------ */
+@media (max-width: 600px) {
+  .mp-adiantar-row { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   [style.css] ============ PARCELADOS PAGOS E ATRASOS ============
+   ------------------------------------------------------------ */
+@media (max-width: 1100px) {
+  .parcelados-page { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   [style.css] ============ PARCELADOS PAGOS E ATRASOS ============
+   ------------------------------------------------------------ */
+@media (max-width: 700px) {
+  .parcelados-pagos-filtros { grid-template-columns: 1fr; }
+  .parcelado-pago-top { flex-direction: column; }
+}
+
+/* ------------------------------------------------------------
+   [style.css] ============ ADIANTAR PARCELAS ============
+   ------------------------------------------------------------ */
+@media (max-width: 600px) {
+  .mp-adiantar-row { grid-template-columns: 1fr; }
+  .gastos-subtabs { overflow-x: auto; }
+  .futura-modal-btns { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   [style.css] ============ CICLO FINANCEIRO (melhoria 1) ============
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .ciclo-grid { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   [style.css] RESUMO DO MES / patches finais
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .resumo-mes-cards { grid-template-columns: 1fr; }
+  .resumo-mes-header { padding: 24px 20px 18px; }
+  .resumo-mes-header h2 { font-size: 20px; }
+}
+
+/* ------------------------------------------------------------
+   [style.css] RESUMO DO MES / patches finais
+   ------------------------------------------------------------ */
+@media (max-width: 560px) {
+  .div-cartao-actions { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   [style.css] RESUMO DO MES / patches finais
+   ------------------------------------------------------------ */
+@media (max-width: 560px) {
+  .pagamento-widget { grid-template-columns: auto 1fr; }
+  .pagamento-widget-count { grid-column: 1 / -1; }
+}
+
+/* ------------------------------------------------------------
+   [style_additions.css] CONFIGURAÇÕES — styles
+   ------------------------------------------------------------ */
+@media (max-width: 600px) { .cfg-backup-grid { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------
+   [style_additions.css] CONFIGURAÇÕES — styles
+   ------------------------------------------------------------ */
+@media (max-width: 600px) {
+  .config-row { flex-direction: column; align-items: stretch; }
+  .config-save-btn { width: 100%; justify-content: center; }
+  .cfg-theme-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ------------------------------------------------------------
+   [style_additions.css] DASHBOARD PERSONALIZÁVEL — Widgets v1
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  /* btn-customizar-dash: não esconder mais — tratado em style_responsive.css */
+  .widgets-half-grid { grid-template-columns: 1fr; }
+  /* Botão hambúrguer mantido oculto (navegação via botão de grade) */
+  .mobile-menu-btn { display: none !important; }
+}
+
+/* ------------------------------------------------------------
+   [style_fase5.css]
+   ------------------------------------------------------------ */
+@media (max-width: 480px) {
+  .wizard-options-3col { grid-template-columns: repeat(2, 1fr); }
+  .wizard-options-3col .wizard-card:last-child { grid-column: span 2; }
+}
+
+/* ------------------------------------------------------------
+   [style_fase5.css]
+   ------------------------------------------------------------ */
+@media (max-width: 640px) {
+  #lembretes-sino-dropdown { width: 260px; right: -40px; }
+}
+
+/* ------------------------------------------------------------
+   [style_wizard.css]
+   ------------------------------------------------------------ */
+@media (max-width: 480px) {
+  .wizard-options { grid-template-columns: 1fr 1fr; }
+  .wizard-meta-row { grid-template-columns: 1fr; }
+  .wizard-icone-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* ------------------------------------------------------------
+   [style_dias_dinamicos.css]
+   ------------------------------------------------------------ */
+@media (max-width: 480px) {
+  #div-cards-dinamico.divisao-cards,
+  #sal-duplo-dinamico.sal-duplo {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------------------------------------
+   [style_responsive.css] 6. DESKTOP GRANDE (> 1280px)
+   ------------------------------------------------------------ */
+@media (min-width: 1281px) {
+  .cards-row { grid-template-columns: repeat(4, 1fr); }
+  .mobile-nav-wrap { display: none !important; }
+  .mobile-nav-dropdown { display: none !important; }
+  .sidebar { transform: translateX(0) !important; box-shadow: none; }
+  .sidebar-toggle-btn { display: flex; }
+}
+
+/* ------------------------------------------------------------
+   [style_responsive.css] 7. DESKTOP PADRAO (1025-1280px)
+   ------------------------------------------------------------ */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .cards-row { grid-template-columns: repeat(4, 1fr); }
+  .mobile-nav-wrap { display: none !important; }
+  .mobile-nav-dropdown { display: none !important; }
+  .sidebar { transform: translateX(0) !important; box-shadow: none; }
+  .sidebar-toggle-btn { display: flex; }
+  .tab-content { padding: 28px 28px; }
+}
+
+/* ------------------------------------------------------------
+   [style_responsive.css] 8. TABLET (769-1024px)
+   ------------------------------------------------------------ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root { --sidebar-w: 190px; }
+
+  .sidebar {
+    transform: translateX(0) !important;
+    position: fixed;
+    width: var(--sidebar-w) !important;
+    box-shadow: none;
+  }
+  .sidebar-toggle-btn { display: flex; }
+  .mobile-overlay { display: none !important; }
+
+  /* Botão de grade visível em tablet */
+  .mobile-nav-wrap { display: block !important; }
+  .mobile-nav-dropdown { right: 16px; top: 62px; width: 200px; }
+
+  .main-content { margin-left: var(--sidebar-w) !important; width: calc(100vw - var(--sidebar-w)) !important; }
+  .cards-row { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .charts-row { grid-template-columns: 1fr; }
+  .parcelados-page { grid-template-columns: 1fr; }
+  .parcelados-side { order: -1; }
+  .pagamentos-wrapper,.cartoes-wrapper { grid-template-columns: 1fr; }
+  .tab-content { padding: 24px 20px; }
+  .topbar { padding: 16px 24px; }
+  .relogio-box { display: none !important; }
+  .divisao-cards { grid-template-columns: 1fr 1fr; }
+  .ciclo-grid { grid-template-columns: 1fr 1fr; }
+  .cal-cell { min-height: 70px; }
+  .widgets-half-grid { grid-template-columns: 1fr 1fr; }
+
+  .topbar-right { gap: 8px; }
+  .btn-add span { display: none; }
+  .btn-add { padding: 9px 11px; }
+}
+
+/* ------------------------------------------------------------
+   [style_responsive.css] 9. MOBILE (<=768px)
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+
+  /* ── Sidebar completamente escondida no mobile ── */
+  .sidebar {
+    display: none !important;
+  }
+  .sidebar-toggle-btn { display: none !important; }
+
+  /* ── Botão de grade visível, hambúrguer ausente ── */
+  .mobile-nav-wrap { display: block !important; }
+  .mobile-nav-dropdown { top: 58px; right: 10px; width: 220px; }
+
+  /* ── Main ocupa a tela toda ── */
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-height: 100dvh;
+  }
+
+  /* ── Topbar limpa e compacta ── */
+  .topbar {
+    padding: 12px 16px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-left  { flex: 1; min-width: 0; }
+  .topbar-right { gap: 8px; flex-wrap: nowrap; align-items: center; }
+  .topbar h2    { font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tab-sub      { font-size: 11px; margin-top: 1px; }
+  .relogio-box  { display: none !important; }
+
+  /* ── Botão adicionar — só ícone ── */
+  .btn-add span { display: none; }
+  .btn-add { padding: 9px 11px; }
+  .btn-add svg { width: 18px; height: 18px; }
+  .btn-resumo-mes span, .btn-undo span { display: none; }
+  .btn-resumo-mes, .btn-undo { padding: 9px; }
+
+  /* ── Tab content com padding generoso ── */
+  .tab-content { padding: 16px 14px 24px; }
+
+  /* ── Cards: 2 colunas mais espaçosas ── */
+  .cards-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .card {
+    padding: 16px 14px;
+    border-radius: 14px;
+  }
+  .card-value { font-size: 20px; }
+  .card-label { font-size: 11px; }
+  .card-hint  { font-size: 11px; }
+
+  /* ── Charts ── */
+  .charts-row { grid-template-columns: 1fr; gap: 12px; }
+  .chart-box  { padding: 18px 14px; border-radius: 14px; }
+  .chart-box h3 { font-size: 14px; }
+
+  /* ── Insights ── */
+  .insights-wrapper { padding: 16px 14px; border-radius: 14px; }
+  .insight-chip { font-size: 12px; }
+
+  /* ── Divisão ── */
+  .divisao-cards  { grid-template-columns: 1fr; gap: 10px; }
+  .div-card       { padding: 22px 18px; border-radius: 14px; }
+  .div-card-date  { font-size: 34px; }
+  .div-card-value { font-size: 22px; }
+  .div-breakdown  { padding: 18px 14px; border-radius: 14px; }
+
+  /* ── Salário ── */
+  .sal-duplo      { grid-template-columns: 1fr; }
+  .sal-extra-grid { grid-template-columns: 1fr; }
+  .salario-box    { gap: 14px; }
+
+  /* ── Parcelados ── */
+  .parcelados-page { grid-template-columns: 1fr; }
+  .parcelados-side { order: -1; }
+  .parcelado-item  { padding: 14px 16px; border-radius: 12px; }
+  .parcelado-valor-parcela { font-size: 18px; }
+
+  /* ── Cartões e pagamentos ── */
+  .cartoes-wrapper, .pagamentos-wrapper { grid-template-columns: 1fr; }
+
+  /* ── Calendário ── */
+  .cal-cell  { min-height: 46px; padding: 3px; }
+  .cal-dot   { display: none; }
+  .cal-cell-num   { font-size: 11px; }
+  .cal-cell-total { font-size: 10px; }
+  .cal-mes-titulo { font-size: 17px; }
+  .cal-grid-header span { font-size: 9px; }
+  .cal-resumo-chip { min-width: 100px; }
+  .cal-resumo-val { font-size: 15px; }
+
+  /* ── Ciclo ── */
+  .ciclo-grid { grid-template-columns: 1fr; }
+
+  /* ── Extrato ── */
+  .extrato-dia      { padding: 14px 14px; border-radius: 12px; }
+  .extrato-dia-head h3 { font-size: 14px; }
+  .extrato-item     { gap: 10px; padding: 11px 14px; border-radius: 10px; }
+
+  /* ── Gastos ── */
+  .gasto-item     { gap: 10px; padding: 13px 14px; border-radius: 12px; }
+  .gasto-cat-icon { width: 36px; height: 36px; font-size: 16px; border-radius: 9px; }
+  .gasto-loja { font-size: 14px; }
+  .gasto-valor { font-size: 14px; }
+  .gasto-desc  { font-size: 11px; }
+  .gasto-data  { font-size: 11px; }
+
+  /* ── Recorrentes ── */
+  .recorrente-item  { gap: 10px; padding: 13px 16px; border-radius: 12px; }
+  .recorrente-icon  { width: 38px; height: 38px; font-size: 17px; }
+  .recorrente-nome  { font-size: 14px; }
+  .recorrente-valor { font-size: 15px; }
+
+  /* ── Modais — deslizam de baixo ── */
+  .modal-overlay { padding: 12px; align-items: flex-end; }
+  .modal { border-radius: 20px 20px 12px 12px; margin: 0 4px; max-height: 92vh; }
+  .modal-header { padding: 20px 18px 0; }
+  .modal-header h3 { font-size: 18px; }
+  .modal-body  { padding: 18px 18px; gap: 14px; }
+  .modal-footer { padding: 0 18px 20px; gap: 10px; }
+  .modal-footer .btn-primary,
+  .modal-footer .btn-secondary { padding: 13px 16px; font-size: 14px; }
+
+  .resumo-mes-overlay { align-items: center; padding: 16px; }
+  .confirm-overlay    { padding: 16px; }
+  .historico-overlay  { padding: 0; align-items: flex-end; }
+  .historico-painel   { max-width: 100%; border-radius: 20px 20px 0 0; }
+  .customizar-overlay { align-items: flex-end; padding: 0; }
+  .customizar-modal   { max-width: 100%; border-radius: 20px 20px 0 0; max-height: 90vh; }
+
+  /* Blur reduzido (performance) */
+  .modal-overlay, .confirm-overlay, .resumo-mes-overlay,
+  .historico-overlay, .customizar-overlay { backdrop-filter: blur(2px); }
+
+  /* ── Parcelas modal ── */
+  .mp-row { grid-template-columns: 40px 1fr 80px; gap: 8px; padding: 11px 14px; }
+  .mp-venc, .mp-data-paga { display: none; }
+
+  /* ── Toast ── */
+  .toast { right: 12px; bottom: 18px; left: 12px; max-width: none; font-size: 13px; padding: 13px 16px; border-radius: 12px; }
+
+  /* ── Config ── */
+  .config-wrapper { gap: 14px; }
+  .config-section-header { padding: 16px 18px 14px; gap: 12px; }
+  .config-section-icon { width: 40px; height: 40px; }
+  .config-section-header h3 { font-size: 15px; }
+  .config-section-header p  { font-size: 12px; }
+  .config-body { padding: 16px 18px; gap: 16px; }
+  .config-row  { flex-direction: column; align-items: stretch; }
+  .config-save-btn { width: 100%; justify-content: center; }
+  .cfg-backup-grid { grid-template-columns: 1fr; }
+  .cfg-theme-grid  { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .cfg-theme-preview { height: 44px; }
+  .cfg-conta-uid  { font-size: 10px; max-width: 200px; }
+
+  /* ── Filter ── */
+  .filter-row { gap: 8px; }
+  .filter-row select, .filter-row input { font-size: 13px; padding: 8px 10px; border-radius: 10px; }
+
+  /* ── Widgets ── */
+  .widgets-half-grid  { grid-template-columns: 1fr; }
+  .widget-content { padding: 16px 14px; }
+
+  /* ── Botão Widgets: visível no mobile, compacto (só ícone) ── */
+  .btn-customizar-dash {
+    display: flex !important;
+    padding: 9px 10px !important;
+    font-size: 0 !important;   /* esconde o texto "Widgets" */
+    gap: 0 !important;
+    min-width: 38px;
+    justify-content: center;
+  }
+  .btn-customizar-dash svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* ── Filtros de gastos: 2 colunas no mobile ── */
+  .filter-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px !important;
+  }
+  /* Busca ocupa linha inteira */
+  .filter-row input[id="filter-search"],
+  .filter-row input[id="filter-futuras"],
+  .filter-row input[id="filter-reprovados"] {
+    grid-column: 1 / -1;
+  }
+  /* Botão Limpar datas ocupa linha inteira */
+  .filter-clear-btn {
+    grid-column: 1 / -1;
+    text-align: center;
+    justify-content: center;
+  }
+  /* Date inputs lado a lado */
+  .filter-row input[type="date"] {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .parcelados-pagos-filtros { grid-template-columns: 1fr; }
+
+  /* ── Login ── */
+  .login-card { padding: 36px 24px; border-radius: 20px; }
+  .login-logo h1 { font-size: 26px; }
+
+  /* ── Resumo mês ── */
+  .resumo-mes-cards  { grid-template-columns: 1fr; gap: 10px; padding: 18px; }
+  .resumo-mes-header { padding: 22px 18px 14px; }
+  .resumo-mes-header h2 { font-size: 19px; }
+  .resumo-stat-val   { font-size: 19px; }
+  .resumo-mes-fechar { width: calc(100% - 36px); margin: 0 18px 18px; }
+
+  /* ── Confirm ── */
+  .confirm-modal  { padding: 30px 22px 24px; border-radius: 18px; }
+  .confirm-titulo { font-size: 18px; }
+
+  /* ── Performance: desativa hover effects custosos ── */
+  .card:hover        { transform: none; }
+  .btn-primary:hover { transform: none; }
+  .btn-add:hover     { transform: none; opacity: 1; }
+  .nav-item:hover    { transform: none; }
+
+  /* ── Scroll suave ── */
+  .tab-content, .modal-body { -webkit-overflow-scrolling: touch; }
+
+  /* ── Animação de card desativada (melhora FPS) ── */
+  .card { animation: none !important; }
+
+  /* ── Adiantar ── */
+  .mp-adiantar-row { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------
+   [style_responsive.css] 10. CELULAR PEQUENO (<=480px)
+   ------------------------------------------------------------ */
+@media (max-width: 480px) {
+  .mobile-nav-dropdown { width: 205px; right: 8px; top: 56px; }
+  .cards-row { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .card { padding: 14px 12px; }
+  .card-value { font-size: 18px; }
+  .tab-content { padding: 12px 10px 20px; }
+  .topbar { padding: 10px 12px; gap: 8px; }
+  .topbar h2 { font-size: 16px; }
+  .divisao-cards  { grid-template-columns: 1fr; }
+  .div-card-date  { font-size: 30px; }
+  .div-card-value { font-size: 19px; }
+  .chart-box { padding: 14px 12px; }
+  .gasto-item, .recorrente-item, .extrato-dia { padding: 12px; }
+
+  /* ── Filtros de gastos: coluna única em telas muito pequenas ── */
+  .filter-row {
+    grid-template-columns: 1fr !important;
+  }
+  .filter-row input[id="filter-search"],
+  .filter-row input[id="filter-futuras"],
+  .filter-row input[id="filter-reprovados"],
+  .filter-clear-btn,
+  .filter-row input[type="date"] {
+    grid-column: 1 / -1;
+  }
+
+  /* ── Subtabs de gastos: menores para caber ── */
+  .gastos-subtab { font-size: 11px; padding: 8px 10px; }
+}
+
+/* ------------------------------------------------------------
+   [style_responsive.css] 11. SCROLLBAR CUSTOMIZADA (desktop)
+   ------------------------------------------------------------ */
+@media (min-width: 769px) {
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+}

@@ -1,0 +1,1356 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinancesApp</title>
+  <link rel="icon" type="image/png" href="assets/logo-financas-smart.jpg">
+  <link rel="apple-touch-icon" href="assets/logo-financas-smart.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Otimização de carregamento: abre a conexão com os domínios do Firebase
+       o quanto antes, em paralelo com o resto do parsing da página, para que
+       a primeira chamada real (login/auth) não pague o custo de DNS+TLS. -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="preconnect" href="https://firebasestorage.googleapis.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- defer: Chart.js só é usado depois que o usuário navega pra uma aba com
+       gráfico, então não precisa bloquear o parsing/pintura inicial da página -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/financeiro.css">
+  <link rel="stylesheet" href="css/perfil.css">
+  <link rel="stylesheet" href="css/cadastro.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<!-- =================== LOGIN =================== -->
+<div id="login-screen">
+  <div class="login-card" id="login-card">
+    <div class="wipe-overlay" id="cadastro-wipe-overlay"></div>
+    <div class="login-logo">
+      <img class="logo-icon" src="assets/logo-financas-smart.jpg" alt="FinancesApp">
+      <h1>Finances<span>App</span></h1>
+    </div>
+    <p class="login-sub">Controle total dos seus gastos</p>
+
+    <div id="form-login">
+      <div class="input-group">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com" />
+      </div>
+      <div class="input-group">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="••••••••" />
+      </div>
+      <div id="login-error" class="login-feedback error"></div>
+      <button type="button" class="btn-primary" onclick="doLogin()">Entrar</button>
+      <div class="login-switch">
+        <button type="button" class="btn-link" onclick="showCadastro()">Criar nova conta</button>
+        <button type="button" class="btn-link" onclick="showRecuperar()">Esqueci minha senha</button>
+      </div>
+    </div>
+
+    <div id="form-cadastro" style="display:none">
+      <div class="input-group">
+        <label>Nome</label>
+        <input type="text" id="cad-nome" placeholder="Seu nome" />
+      </div>
+      <div class="input-group">
+        <label>E-mail</label>
+        <input type="email" id="cad-email" placeholder="seu@email.com" />
+      </div>
+      <div class="input-group">
+        <label>Senha</label>
+        <input type="password" id="cad-pass" placeholder="Mínimo 6 caracteres" />
+      </div>
+      <div class="input-group">
+        <label>Confirmar senha</label>
+        <input type="password" id="cad-pass2" placeholder="Repita sua senha" />
+      </div>
+      <div id="cad-msg" class="login-feedback error"></div>
+      <button type="button" class="btn-primary" onclick="doCadastro()">Criar conta</button>
+      <div class="login-switch">
+        <button type="button" class="btn-link" onclick="showLogin()">← Já tenho conta</button>
+      </div>
+    </div>
+
+    <!-- =================== WIZARD DE CONFIGURAÇÃO INICIAL (Quiz) =================== -->
+    <div id="form-wizard" style="display:none">
+      <div class="wizard-progress" id="wizard-progress">
+        <div class="wizard-dot active" data-step="perfil"></div>
+        <div class="wizard-dot" data-step="freq" style="display:none"></div>
+        <div class="wizard-dot" data-step="recebimento"></div>
+        <div class="wizard-dot" data-step="meta"></div>
+      </div>
+
+      <!-- Passo 1 — Perfil -->
+      <div class="wizard-step active" id="wizard-step-perfil">
+        <h2 class="wizard-title">Qual seu perfil?</h2>
+        <p class="wizard-subtitle">Vamos personalizar seu Dashboard de acordo com seu objetivo.</p>
+        <div class="wizard-options" id="wizard-perfil-options">
+          <button type="button" class="wizard-card" data-value="investidor">
+            <span class="wizard-card-icone">📈</span>
+            <span class="wizard-card-label">Investidor</span>
+          </button>
+          <button type="button" class="wizard-card" data-value="dividas">
+            <span class="wizard-card-icone">🆘</span>
+            <span class="wizard-card-label">Quero sair das dívidas</span>
+          </button>
+          <button type="button" class="wizard-card" data-value="controle">
+            <span class="wizard-card-icone">🧭</span>
+            <span class="wizard-card-label">Controle pessoal</span>
+          </button>
+          <button type="button" class="wizard-card" data-value="autonomo">
+            <span class="wizard-card-icone">💼</span>
+            <span class="wizard-card-label">Empreendedor / Autônomo</span>
+          </button>
+          <button type="button" class="wizard-card" data-value="casal">
+            <span class="wizard-card-icone">❤️</span>
+            <span class="wizard-card-label">Casal / Família</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Passo 2 (dinâmico) — tela própria, só existe no fluxo de quem escolheu Empreendedor/Autônomo -->
+      <div class="wizard-step" id="wizard-step-freq">
+        <h2 class="wizard-title">Como deseja adicionar suas entradas?</h2>
+        <p class="wizard-subtitle">Isso nos ajuda a te lembrar de registrar sua renda variável.</p>
+        <div class="wizard-options wizard-options-3col" id="wizard-freq-entradas-options">
+          <button type="button" class="wizard-card" data-value="diaria">
+            <span class="wizard-card-icone">📆</span>
+            <span class="wizard-card-label">Diariamente</span>
+          </button>
+          <button type="button" class="wizard-card" data-value="semanal">
+            <span class="wizard-card-icone">🗓️</span>
+            <span class="wizard-card-label">Semanalmente</span>
+          </button>
+          <button type="button" class="wizard-card" data-value="mensal">
+            <span class="wizard-card-icone">📅</span>
+            <span class="wizard-card-label">Mensalmente</span>
+          </button>
+        </div>
+
+        <div class="wizard-sub-block" id="wizard-freq-semana-block" style="display:none">
+          <div class="input-group">
+            <label>Qual dia da semana deseja adicionar suas entradas?</label>
+            <select id="wizard-dia-semana-entradas">
+              <option value="1">Segunda-feira</option>
+              <option value="2">Terça-feira</option>
+              <option value="3">Quarta-feira</option>
+              <option value="4">Quinta-feira</option>
+              <option value="5">Sexta-feira</option>
+              <option value="6">Sábado</option>
+              <option value="0">Domingo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="wizard-sub-block" id="wizard-freq-mes-block" style="display:none">
+          <div class="input-group">
+            <label>Qual dia do mês deseja adicionar suas entradas?</label>
+            <input type="number" id="wizard-dia-mes-entradas" min="1" max="31" placeholder="Ex: 5" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Passo 3 — Recebimento de salário -->
+      <div class="wizard-step" id="wizard-step-recebimento">
+        <h2 class="wizard-title">Como você recebe salário?</h2>
+        <p class="wizard-subtitle">Isso ajusta automaticamente calendário, lembretes e divisão de contas.</p>
+        <div class="wizard-options wizard-options-2col" id="wizard-recebimento-options">
+          <button type="button" class="wizard-card" data-value="unico">
+            <span class="wizard-card-icone">📅</span>
+            <span class="wizard-card-label">Apenas 1 dia por mês</span>
+          </button>
+          <button type="button" class="wizard-card" data-value="multiplo">
+            <span class="wizard-card-icone">🗓️</span>
+            <span class="wizard-card-label">Dividido em 2 ou mais dias</span>
+          </button>
+        </div>
+
+        <div class="wizard-sub-block" id="wizard-dia-unico-block" style="display:none">
+          <div class="input-group">
+            <label>Dia do recebimento</label>
+            <input type="number" id="wizard-dia-unico" min="1" max="31" placeholder="Ex: 5" />
+          </div>
+        </div>
+
+        <div class="wizard-sub-block" id="wizard-dias-multiplos-block" style="display:none">
+          <div class="input-group">
+            <label>Dias de recebimento</label>
+            <div class="wizard-dia-add-row">
+              <input type="number" id="wizard-dia-novo" min="1" max="31" placeholder="Ex: 20" />
+              <button type="button" class="btn-secondary" id="wizard-dia-add-btn">+ Adicionar dia</button>
+            </div>
+          </div>
+          <div class="wizard-dias-chips" id="wizard-dias-chips"></div>
+        </div>
+      </div>
+
+      <!-- Passo 4 — Meta financeira (ou dívida, para quem escolheu "Sair das dívidas") -->
+      <div class="wizard-step" id="wizard-step-meta">
+        <h2 class="wizard-title" id="wizard-step3-title">Você possui alguma meta financeira?</h2>
+        <p class="wizard-subtitle" id="wizard-step3-subtitle">Se tiver, já criamos ela pra você.</p>
+
+        <div class="wizard-options wizard-options-2col" id="wizard-meta-options">
+          <button type="button" class="wizard-card" data-value="nao">
+            <span class="wizard-card-icone">➡️</span>
+            <span class="wizard-card-label">Agora não</span>
+          </button>
+          <button type="button" class="wizard-card" data-value="sim">
+            <span class="wizard-card-icone">🎯</span>
+            <span class="wizard-card-label">Sim, tenho uma meta</span>
+          </button>
+        </div>
+
+        <div class="wizard-sub-block" id="wizard-meta-form" style="display:none">
+          <div class="input-group">
+            <label>Nome da meta</label>
+            <input type="text" id="wizard-meta-nome" placeholder="Ex: Viagem, Reserva de emergência..." />
+          </div>
+          <div class="wizard-meta-row">
+            <div class="input-group">
+              <label>Valor alvo</label>
+              <input type="number" id="wizard-meta-objetivo" step="0.01" min="0" placeholder="0,00" />
+            </div>
+            <div class="input-group">
+              <label>Valor inicial (já guardado)</label>
+              <input type="number" id="wizard-meta-inicial" step="0.01" min="0" placeholder="0,00" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Cor</label>
+            <input type="color" id="wizard-meta-cor" value="#f0c040" class="meta-color-input" />
+          </div>
+          <div class="input-group">
+            <label>Ícone</label>
+            <div class="wizard-icone-grid" id="wizard-icone-grid"></div>
+          </div>
+        </div>
+
+        <!-- Bloco exclusivo de quem escolheu "Quero sair das dívidas" no Passo 1.
+             Substitui as perguntas de meta acima: a meta "Quitar dívidas" é
+             criada automaticamente na aba Metas com o valor informado aqui. -->
+        <div class="wizard-sub-block" id="wizard-divida-form" style="display:none">
+          <div class="input-group">
+            <label>Valor total da sua dívida</label>
+            <input type="number" id="wizard-divida-valor" step="0.01" min="0" placeholder="0,00" />
+          </div>
+          <p class="wizard-subtitle" style="margin:0">Vamos criar automaticamente uma meta chamada "Quitar dívidas" na aba Metas com esse valor. Você pode editá-la ou excluí-la depois, quando quiser.</p>
+        </div>
+      </div>
+
+      <div id="wizard-msg" class="login-feedback error"></div>
+
+      <div class="wizard-nav">
+        <button type="button" class="btn-secondary" id="wizard-btn-voltar" style="visibility:hidden">← Voltar</button>
+        <button type="button" class="btn-primary" id="wizard-btn-avancar">Avançar</button>
+      </div>
+    </div>
+
+    <div id="form-recuperar" style="display:none">
+      <p class="recuperar-info">Digite seu e-mail e enviaremos um link para redefinir sua senha.</p>
+      <div class="input-group">
+        <label>E-mail cadastrado</label>
+        <input type="email" id="rec-email" placeholder="seu@email.com" />
+      </div>
+      <div id="rec-msg" class="login-feedback error"></div>
+      <button type="button" class="btn-primary" onclick="doRecuperar()">Enviar link de recuperação</button>
+      <div class="login-switch">
+        <button type="button" class="btn-link" onclick="showLogin()">← Voltar para o login</button>
+      </div>
+    </div>
+
+    <div id="form-verificacao" style="display:none">
+      <p class="recuperar-info">Enviamos um e-mail de verificação. Confirme pelo link recebido e depois volte aqui — se for sua primeira vez, faremos algumas perguntas rápidas para configurar seu app antes de liberar o acesso.</p>
+      <div id="ver-email" class="login-email-pill"></div>
+      <div id="ver-msg" class="login-feedback error"></div>
+      <button type="button" class="btn-primary" onclick="checarEmailVerificado()">Já verifiquei meu e-mail</button>
+      <button type="button" class="btn-secondary" onclick="reenviarEmailVerificacao()">Reenviar verificação</button>
+      <div class="login-switch">
+        <button type="button" class="btn-link" onclick="doLogout()">Sair e usar outra conta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== APP =================== -->
+<div id="app" style="display:none">
+  <div class="mobile-overlay" id="mobile-overlay" onclick="closeMobileMenu()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img class="logo-icon" src="assets/logo-financas-smart.jpg" alt="FinancesApp">
+      <span class="nav-label">Finances<b>App</b></span>
+    </div>
+    <nav>
+      <a href="#" class="nav-item active" data-tab="dashboard" data-tooltip="Dashboard" onclick="switchTab('dashboard'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="gastos" data-tooltip="Gastos" onclick="switchTab('gastos'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+        <span class="nav-label">Gastos</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="extrato" data-tooltip="Extrato" onclick="switchTab('extrato'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6zm2-8h8v2H8v-2zm0 4h8v2H8v-2zm0-8h4v2H8V8z"/></svg>
+        <span class="nav-label">Extrato</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="parcelados" data-tooltip="Parcelados" onclick="switchTab('parcelados'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        <span class="nav-label">Parcelados</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="recorrentes" data-tooltip="Recorrentes" onclick="switchTab('recorrentes'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5 0 .86-.22 1.67-.6 2.38l1.46 1.46C18.58 15.73 19 14.42 19 13c0-3.87-3.13-7-7-7zm-5.86.16C5.42 7.27 5 8.58 5 10c0 3.87 3.13 7 7 7v3l4-4-4-4v3c-2.76 0-5-2.24-5-5 0-.86.22-1.67.6-2.38L6.14 6.16z"/></svg>
+        <span class="nav-label">Recorrentes</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="metas" data-tooltip="Metas" onclick="switchTab('metas'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+        <span class="nav-label">Metas</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="salario" data-tooltip="Salário" onclick="switchTab('salario'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+        <span class="nav-label">Salário</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="divisao" data-tooltip="Divisão 15/30" onclick="switchTab('divisao'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M11 14H9c0-4.97 4.03-9 9-9v2c-3.87 0-7 3.13-7 7zm7-3V9c-2.76 0-5 2.24-5 5h2c0-1.66 1.34-3 3-3zM7 4c0-1.11-.89-2-2-2S3 2.89 3 4s.89 2 2 2 2-.89 2-2zm5.45 15c-.42 1.16-1.52 2-2.82 2H7.27C6 21 5 20 5 18.73v-3.45C3.85 14.56 3 13.38 3 12c0-1.66 1.34-3 3-3 .34 0 .67.06.98.17L8.41 7.24C7.61 6.47 7 5.34 7 4.17V4h2.09c.42 2.31 2.46 4 4.91 4 .34 0 .67-.04 1-.1V9.1c-.32.06-.66.1-1 .1-1.86 0-3.41-1-4.25-2.46L8.46 8.3C9.47 9.14 10 10.5 10 12c0 1.5-.65 2.85-1.67 3.8l-.33.3V18.73c0 .15.12.27.27.27H9.63c.62 0 1.17-.38 1.4-.95L12.45 19z"/></svg>
+        <span class="nav-label">Divisão 15/30</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="calendario" data-tooltip="Calendário" onclick="switchTab('calendario'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+        <span class="nav-label">Calendário</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="cartoes" data-tooltip="Cartões" onclick="switchTab('cartoes'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        <span class="nav-label">Cartões</span>
+      </a>
+      <a href="#" class="nav-item nav-item-config" data-tab="configuracoes" data-tooltip="Configurações" onclick="switchTab('configuracoes'); return false;">
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <span class="nav-label">Configurações</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="sidebar-user" data-tooltip="Minha conta" onclick="switchTab('configuracoes')">
+        <div class="sidebar-user-avatar" id="sidebar-user-avatar">
+          <span id="sidebar-user-iniciais">?</span>
+          <img id="sidebar-user-img" src="" alt="" style="display:none">
+        </div>
+        <span class="nav-label sidebar-user-nome" id="sidebar-user-nome">Minha conta</span>
+      </div>
+      <button type="button" class="btn-logout" data-tooltip="Sair" onclick="doLogout()">
+        <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        <span class="nav-label">Sair</span>
+      </button>
+    </div>
+  </aside>
+  <button class="sidebar-toggle-btn pulse" id="sidebar-toggle" onclick="toggleSidebar()" title="Recolher menu">
+    <span class="toggle-icon">
+      <span class="toggle-line toggle-line-top"></span>
+      <span class="toggle-line toggle-line-bottom"></span>
+    </span>
+  </button>
+
+  <main class="main-content">
+
+    <header class="topbar">
+      <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Abrir menu">
+        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+      <div class="topbar-left">
+        <h2 id="tab-title">Dashboard</h2>
+        <span id="tab-subtitle" class="tab-sub"></span>
+      </div>
+      <div class="topbar-right">
+        <div class="relogio-box">
+          <div class="relogio-hora" id="relogio-hora">00:00</div>
+          <div class="relogio-data" id="relogio-data">--/--/----</div>
+        </div>
+        <button type="button" class="btn-add" onclick="openModal()">
+          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          <span>Adicionar</span>
+        </button>
+        <!-- Botão de navegação rápida mobile -->
+        <div class="mobile-nav-wrap" id="mobile-nav-wrap">
+          <button class="mobile-nav-btn" id="mobile-nav-btn" onclick="toggleMobileNav()" aria-label="Navegar">
+            <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+          </button>
+          <div class="mobile-nav-dropdown" id="mobile-nav-dropdown">
+            <div class="mobile-nav-title">Navegar para</div>
+            <button class="mobile-nav-item" onclick="mobileNavTo('dashboard')">
+              <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+              Dashboard
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('gastos')">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+              Gastos
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('extrato')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6zm2-8h8v2H8v-2zm0 4h8v2H8v-2zm0-8h4v2H8V8z"/></svg>
+              Extrato
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('parcelados')">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+              Parcelados
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('recorrentes')">
+              <svg viewBox="0 0 24 24"><path d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5 0 .86-.22 1.67-.6 2.38l1.46 1.46C18.58 15.73 19 14.42 19 13c0-3.87-3.13-7-7-7zm-5.86.16C5.42 7.27 5 8.58 5 10c0 3.87 3.13 7 7 7v3l4-4-4-4v3c-2.76 0-5-2.24-5-5 0-.86.22-1.67.6-2.38L6.14 6.16z"/></svg>
+              Recorrentes
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('metas')">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+              Metas
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('salario')">
+              <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+              Salário
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('divisao')">
+              <svg viewBox="0 0 24 24"><path d="M11 14H9c0-4.97 4.03-9 9-9v2c-3.87 0-7 3.13-7 7zm7-3V9c-2.76 0-5 2.24-5 5h2c0-1.66 1.34-3 3-3zM7 4c0-1.11-.89-2-2-2S3 2.89 3 4s.89 2 2 2 2-.89 2-2z"/></svg>
+              Divisão 15/30
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('calendario')">
+              <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+              Calendário
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('cartoes')">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+              Cartões
+            </button>
+            <button class="mobile-nav-item" onclick="mobileNavTo('configuracoes')">
+              <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+              Configurações
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section id="tab-dashboard" class="tab-content active">
+      <div class="cards-row">
+        <div class="card card-income" style="animation-delay:0ms">
+          <div class="card-label">Renda Total</div>
+          <div class="card-value" id="card-renda">R$ 0,00</div>
+          <div class="card-hint" id="card-renda-hint">Salários + extras</div>
+        </div>
+        <div class="card card-expense" style="animation-delay:80ms">
+          <div class="card-label">Total de Gastos</div>
+          <div class="card-value" id="card-gastos">R$ 0,00</div>
+          <div class="card-hint" id="card-gastos-var">Este mês</div>
+        </div>
+        <div class="card card-balance" style="animation-delay:160ms">
+          <div class="card-label">Saldo Líquido</div>
+          <div class="card-value" id="card-saldo">R$ 0,00</div>
+          <div class="card-hint">Renda − Gastos</div>
+        </div>
+        <div class="card card-parcel" style="animation-delay:240ms">
+          <div class="card-label">Parcela Mensal</div>
+          <div class="card-value" id="card-parcela">R$ 0,00</div>
+          <div class="card-hint">Metade no dia 15 e 30</div>
+        </div>
+      </div>
+
+      <!-- Área de widgets personalizáveis -->
+      <div id="dashboard-widgets-area" class="dashboard-widgets-area">
+        <!-- Widgets são renderizados dinamicamente por dashboard_widgets.js -->
+        <!-- Fallback para quando o sistema de widgets não está carregado -->
+        <div class="insights-wrapper">
+          <div class="insights-titulo">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:var(--accent)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            Insights automáticos
+          </div>
+          <div id="insights-box" class="insights-box"></div>
+        </div>
+        <div class="charts-row">
+          <div class="chart-box">
+            <h3>Gastos por Categoria</h3>
+            <canvas id="chartPizza"></canvas>
+          </div>
+          <div class="chart-box">
+            <h3>Evolução Mensal</h3>
+            <canvas id="chartBarra"></canvas>
+          </div>
+        </div>
+        <div class="explicador-wrapper">
+          <div id="explicador-saldo"></div>
+        </div>
+        <div class="ciclo-wrapper">
+          <div id="ciclo-financeiro"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GASTOS ===== -->
+    <section id="tab-gastos" class="tab-content">
+
+      <!-- Sub-tabs -->
+      <div class="gastos-subtabs">
+        <button class="gastos-subtab active" id="subtab-btn-ativos" onclick="switchGastosSubtab('ativos')">
+          📋 Gastos
+        </button>
+        <button class="gastos-subtab" id="subtab-btn-pendentes" onclick="switchGastosSubtab('pendentes')">
+          🕐 Compras Futuras
+          <span class="subtab-badge" id="badge-pendentes">0</span>
+        </button>
+        <button class="gastos-subtab" id="subtab-btn-reprovados" onclick="switchGastosSubtab('reprovados')">
+          ❌ Reprovados
+          <span class="subtab-badge subtab-badge-red" id="badge-reprovados">0</span>
+        </button>
+      </div>
+
+      <!-- SUB-TAB: GASTOS ATIVOS -->
+      <div id="subtab-ativos">
+        <div class="filter-row">
+          <input type="text" id="filter-search" placeholder="🔍 Buscar gastos..." oninput="renderGastosList()" style="flex:1.5" />
+          <select id="filter-cat" onchange="renderGastosList()">
+            <option value="">Todas as categorias</option>
+            <option>Roupas e calçados</option>
+            <option>Alimentação</option>
+            <option>Lazer</option>
+            <option>Auto-cuidado</option>
+            <option>Transporte</option>
+            <option>Jogos</option>
+                      <option>Sobrou do último mês</option>
+          </select>
+          <input type="date" id="filter-start" onchange="renderGastosList()" title="Data inicial" />
+          <input type="date" id="filter-end" onchange="renderGastosList()" title="Data final" />
+          <button type="button" class="filter-clear-btn" onclick="limparFiltroDatas()">Limpar datas</button>
+        </div>
+        <div class="gastos-list" id="gastos-list"></div>
+      </div>
+
+      <!-- SUB-TAB: COMPRAS FUTURAS (pendentes de aprovação) -->
+      <div id="subtab-pendentes" style="display:none">
+        <div class="filter-row">
+          <input type="text" id="filter-futuras" placeholder="🔍 Buscar compras futuras..." oninput="renderFuturasList()" style="flex:1" />
+        </div>
+        <div id="futuras-list"></div>
+      </div>
+
+      <!-- SUB-TAB: REPROVADOS -->
+      <div id="subtab-reprovados" style="display:none">
+        <div class="filter-row">
+          <input type="text" id="filter-reprovados" placeholder="🔍 Buscar nos reprovados..." oninput="renderReprovadosList()" style="flex:1" />
+        </div>
+        <div id="reprovados-list"></div>
+      </div>
+
+    </section>
+
+    <!-- ===== EXTRATO ===== -->
+    <section id="tab-extrato" class="tab-content">
+      <div class="extrato-list" id="extrato-list"></div>
+    </section>
+
+    <!-- ===== PARCELADOS ===== -->
+    <section id="tab-parcelados" class="tab-content">
+      <div class="parcelados-page">
+        <div class="parcelados-main">
+          <div class="parcelados-section-head">
+            <h3>Parcelados em andamento</h3>
+            <span id="parcelados-ativos-resumo">0 itens</span>
+          </div>
+          <div class="parcelados-list" id="parcelados-list"></div>
+
+          <div class="parcelados-pagos-resumo-btn" onclick="abrirModalParceladosPagos()">
+            <div class="parcelados-pagos-resumo-info">
+              <h3>Gastos parcelados pagos</h3>
+              <span id="parcelados-pagos-resumo-txt">Nenhum parcelado quitado ainda</span>
+            </div>
+            <span class="parcelados-pagos-resumo-seta">Ver histórico →</span>
+          </div>
+        </div>
+
+        <aside class="parcelados-side">
+          <div class="parcelados-atrasos-card">
+            <div class="parcelados-section-head">
+              <h3>Atrasos de pagamento</h3>
+            </div>
+            <div class="input-group">
+              <label>Fatura do mês</label>
+              <input type="month" id="atraso-mes" onchange="renderAtrasosParcelados()" />
+            </div>
+            <button type="button" class="btn-atraso" onclick="marcarFaturaMesComoAtrasada()">Marcar fatura como atrasada</button>
+            <div id="parcelados-atrasos-list" class="parcelados-atrasos-list"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===== RECORRENTES ===== -->
+    <section id="tab-recorrentes" class="tab-content">
+      <div class="recorrentes-wrapper">
+        <div class="info-box">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          Para criar uma compra recorrente, clique em Adicionar e escolha a categoria Compras recorrentes.
+        </div>
+        <div id="recorrentes-list" class="recorrentes-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== METAS ===== -->
+    <section id="tab-metas" class="tab-content">
+      <div class="metas-wrapper">
+        <div class="meta-form-box">
+          <h3>Nova Meta</h3>
+          <div class="input-group">
+            <label>Nome da meta</label>
+            <input type="text" id="meta-nome" placeholder="ex: Viagem para a praia"/>
+          </div>
+          <div class="input-group">
+            <label>Objetivo (R$)</label>
+            <input type="number" id="meta-objetivo" placeholder="0,00" min="0" step="0.01"/>
+          </div>
+          <div class="input-group">
+            <label>Onde está guardando</label>
+            <input type="text" id="meta-onde" placeholder="ex: Nubank, Poupança, Cofre..."/>
+          </div>
+          <div class="input-group">
+            <label>Cor do gráfico</label>
+            <input type="color" id="meta-cor" value="#f0c040" class="meta-color-input"/>
+          </div>
+          <div class="input-group">
+            <label style="font-size:13px;font-weight:600;color:var(--text2)">Já tem algum valor guardado para essa meta?</label>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <button type="button" id="meta-guardado-btn-nao" class="meta-guardado-btn active" onclick="setMetaJaGuardado(false)">Não, começar do zero</button>
+              <button type="button" id="meta-guardado-btn-sim" class="meta-guardado-btn" onclick="setMetaJaGuardado(true)">Sim, já tenho um valor</button>
+            </div>
+          </div>
+          <div class="input-group" id="meta-guardado-valor-group" style="display:none">
+            <label>Valor já guardado (R$)</label>
+            <input type="number" id="meta-valor-guardado" placeholder="0,00" min="0" step="0.01"/>
+          </div>
+          <button type="button" class="btn-primary" onclick="salvarMeta()" style="margin-top:6px">Criar Meta</button>
+        </div>
+
+        <div id="metas-charts" class="metas-charts-row"></div>
+        <div id="metas-list" class="metas-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== SALÁRIO ===== -->
+    <section id="tab-salario" class="tab-content">
+      <div class="salario-box">
+        <h3>Registrar Salário do Mês</h3>
+        <p class="salario-desc">Informe o pagamento do dia 15, do dia 30 ou os dois. Você também pode registrar dinheiro externo para entrar no cálculo total da renda.</p>
+
+        <div class="input-group">
+          <label>Mês de referência</label>
+          <input type="month" id="sal-mes" />
+        </div>
+
+        <div class="sal-duplo">
+          <div class="sal-bloco">
+            <div class="sal-bloco-titulo">
+              <span class="sal-dia-badge">Dia 15</span>
+              Primeiro salário
+            </div>
+            <div class="input-group">
+              <label>Valor (R$)</label>
+              <input type="number" id="sal-valor-15" placeholder="0,00" min="0" step="0.01"/>
+            </div>
+          </div>
+          <div class="sal-bloco">
+            <div class="sal-bloco-titulo">
+              <span class="sal-dia-badge sal-dia-30">Dia 30</span>
+              Segundo salário
+            </div>
+            <div class="input-group">
+              <label>Valor (R$)</label>
+              <input type="number" id="sal-valor-30" placeholder="0,00" min="0" step="0.01"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          Renda = Sal. dia 15 + Sal. dia 30 + dinheiro externo + entradas mensais fixas cadastradas.
+        </div>
+
+        <button type="button" class="btn-primary" onclick="salvarSalario()">Salvar Salário</button>
+
+        <div class="sal-extra-box">
+          <h3>Dinheiro externo</h3>
+          <div class="sal-extra-grid">
+            <div class="input-group">
+              <label>De onde veio?</label>
+              <input type="text" id="sal-extra-origem" placeholder="ex: Pix, venda, freela, presente"/>
+            </div>
+            <div class="input-group">
+              <label>Valor (R$)</label>
+              <input type="number" id="sal-extra-valor" placeholder="0,00" min="0" step="0.01"/>
+            </div>
+            <div class="input-group">
+              <label>Data de recebimento</label>
+              <input type="date" id="sal-extra-data"/>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="salvarDinheiroExtra()">Adicionar dinheiro externo</button>
+        </div>
+
+        <div class="sal-extra-box">
+          <h3>Entradas mensais fixas</h3>
+          <div class="sal-extra-grid">
+            <div class="input-group">
+              <label>Nome / origem</label>
+              <input type="text" id="sal-fixa-nome" placeholder="ex: empresa, freelance, aluguel"/>
+            </div>
+            <div class="input-group">
+              <label>Valor mensal (R$)</label>
+              <input type="number" id="sal-fixa-valor" placeholder="0,00" min="0" step="0.01"/>
+            </div>
+            <div class="input-group">
+              <label>Dia do recebimento</label>
+              <input type="number" id="sal-fixa-dia" min="1" max="31" placeholder="15"/>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="salvarEntradaFixa()">Salvar entrada fixa</button>
+          <div id="sal-fixas-list" class="salario-extra-lista"></div>
+        </div>
+
+        <div id="salarios-hist" class="salarios-hist"></div>
+      </div>
+    </section>
+
+    <!-- ===== DIVISÃO 15/30 ===== -->
+    <section id="tab-divisao" class="tab-content">
+      <div class="divisao-box">
+        <div class="divisao-header">
+          <h3>Divisão de Pagamentos — <span id="div-mes-label"></span></h3>
+          <select id="div-mes-select" onchange="renderDivisao()"></select>
+        </div>
+
+        <!-- Cards gerais -->
+        <div class="divisao-cards">
+          <div class="div-card">
+            <div class="div-card-date">15</div>
+            <div class="div-card-value" id="div-15">R$ 0,00</div>
+            <div class="div-card-hint">Guardar / pagar dia 15</div>
+          </div>
+          <div class="div-card">
+            <div class="div-card-date">30</div>
+            <div class="div-card-value" id="div-30">R$ 0,00</div>
+            <div class="div-card-hint">Guardar / pagar dia 30</div>
+          </div>
+        </div>
+
+        <!-- Por cartão (todos) -->
+        <div class="div-por-cartao" id="div-por-cartao"></div>
+
+        <div class="div-breakdown">
+          <h4>Detalhamento Geral</h4>
+          <div id="div-detail"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CALENDÁRIO ===== -->
+    <section id="tab-calendario" class="tab-content">
+      <div class="cal-wrapper">
+        <div class="cal-header">
+          <button type="button" class="cal-nav-btn" onclick="calNavMes(-1)">
+            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
+          <div class="cal-mes-titulo" id="cal-mes-titulo">—</div>
+          <button type="button" class="cal-nav-btn" onclick="calNavMes(1)">
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </button>
+        </div>
+
+        <div class="cal-resumo-row">
+          <div class="cal-resumo-chip">
+            <span class="cal-resumo-label">Total do mês</span>
+            <span class="cal-resumo-val" id="cal-total-mes">R$ 0,00</span>
+          </div>
+          <div class="cal-resumo-chip">
+            <span class="cal-resumo-label">Dias com gastos</span>
+            <span class="cal-resumo-val" id="cal-dias-gastos">0</span>
+          </div>
+          <div class="cal-resumo-chip">
+            <span class="cal-resumo-label">Parcelas ativas</span>
+            <span class="cal-resumo-val" id="cal-parcelas-ativas">0</span>
+          </div>
+        </div>
+
+        <div class="cal-grid-header">
+          <span>Dom</span><span>Seg</span><span>Ter</span>
+          <span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+
+        <div class="cal-detalhe" id="cal-detalhe" style="display:none">
+          <div class="cal-detalhe-header">
+            <span id="cal-detalhe-titulo">Dia</span>
+            <button type="button" class="cal-detalhe-close" onclick="fecharDetalhe()">✕</button>
+          </div>
+          <div class="cal-detalhe-body" id="cal-detalhe-body"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CARTÕES ===== -->
+    <section id="tab-cartoes" class="tab-content">
+      <div class="cartoes-wrapper">
+        <div class="cartao-form-box">
+          <h3 id="cartao-form-titulo">Adicionar Cartão</h3>
+          <p style="color:var(--text2);font-size:13px;margin-bottom:16px">Adicione os cartões que utiliza. O vencimento cadastrado aqui será usado automaticamente nas próximas compras parceladas com esse cartão.</p>
+          <div class="input-group">
+            <label>Nome do cartão</label>
+            <input type="text" id="cartao-nome" placeholder="ex: Nubank, Inter, Bradesco..."/>
+          </div>
+          <div class="input-group" style="margin-top:12px">
+            <label>Bandeira</label>
+            <select id="cartao-bandeira">
+              <option value="">Selecione...</option>
+              <option value="Visa">Visa</option>
+              <option value="Mastercard">Mastercard</option>
+              <option value="Elo">Elo</option>
+              <option value="American Express">American Express</option>
+              <option value="Hipercard">Hipercard</option>
+              <option value="Outra">Outra</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin-top:12px">
+            <label>Limite (R$)</label>
+            <input type="number" id="cartao-limite" placeholder="0,00" min="0" step="0.01"/>
+          </div>
+          <div class="input-group" style="margin-top:12px">
+            <label>Dia de vencimento da fatura</label>
+            <input type="number" id="cartao-vencimento" placeholder="ex: 10" min="1" max="31"/>
+          </div>
+          <div class="input-group" style="margin-top:12px">
+            <label>Cor de identificação</label>
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="color" id="cartao-cor" value="#f0c040" style="width:44px;height:44px;border:none;background:none;cursor:pointer;border-radius:8px;padding:0"/>
+              <span style="color:var(--text2);font-size:13px">Escolha uma cor para identificar o cartão</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:16px">
+            <button type="button" class="btn-primary" id="cartao-salvar-btn" onclick="salvarCartao()" style="flex:1">Adicionar Cartão</button>
+            <button type="button" class="btn-secondary" id="cartao-cancelar-btn" onclick="cancelarEdicaoCartao()" style="display:none">Cancelar</button>
+          </div>
+        </div>
+        <div class="cartao-list-box">
+          <h3>Meus Cartões</h3>
+          <div id="cartoes-list" class="cartoes-list"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===== CONFIGURAÇÕES ===== -->
+    <section id="tab-configuracoes" class="tab-content">
+      <div class="config-wrapper">
+
+        <!-- PERFIL -->
+        <div class="config-section" id="config-perfil">
+          <div class="config-section-header">
+            <div class="config-section-icon" style="background:rgba(77,157,224,0.12);color:var(--blue)">
+              <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            </div>
+            <div>
+              <h3>Perfil</h3>
+              <p>Altere seu nome e senha de acesso</p>
+            </div>
+          </div>
+          <div class="config-body">
+            <div class="config-row perfil-foto-row">
+              <div class="perfil-foto-wrap">
+                <div class="perfil-foto-avatar" id="perfil-foto-avatar">
+                  <span id="perfil-foto-iniciais">?</span>
+                  <img id="perfil-foto-img" src="" alt="Foto de perfil" style="display:none">
+                </div>
+                <input type="file" id="perfil-foto-input" accept="image/png,image/jpeg" style="display:none">
+              </div>
+              <div class="perfil-foto-acoes">
+                <button type="button" class="config-save-btn" onclick="document.getElementById('perfil-foto-input').click()">Alterar foto</button>
+                <button type="button" class="btn-link perfil-foto-remover" id="perfil-foto-remover-btn" onclick="removerFotoPerfil()">Remover foto</button>
+                <p class="perfil-foto-hint">JPEG ou PNG, até 5MB.</p>
+              </div>
+            </div>
+            <div class="config-divider"></div>
+            <div class="config-row">
+              <div class="input-group" style="flex:1">
+                <label>Nome de exibição</label>
+                <input type="text" id="cfg-nome" placeholder="Seu nome" />
+              </div>
+              <button type="button" class="config-save-btn" onclick="salvarNome()">Salvar nome</button>
+            </div>
+            <div class="config-divider"></div>
+            <div class="config-row">
+              <div class="input-group" style="flex:1">
+                <label>Nova senha</label>
+                <input type="password" id="cfg-senha" placeholder="Mínimo 6 caracteres" />
+              </div>
+              <div class="input-group" style="flex:1">
+                <label>Confirmar nova senha</label>
+                <input type="password" id="cfg-senha2" placeholder="Repita a senha" />
+              </div>
+              <button type="button" class="config-save-btn" onclick="salvarSenha()">Alterar senha</button>
+            </div>
+            <div id="cfg-perfil-msg" class="cfg-msg"></div>
+          </div>
+        </div>
+
+        <!-- RECEBIMENTO -->
+        <div class="config-section" id="config-recebimento">
+          <div class="config-section-header">
+            <div class="config-section-icon" style="background:rgba(240,192,64,0.12);color:var(--accent)">
+              <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+            </div>
+            <div>
+              <h3>Dia de recebimento</h3>
+              <p>Usado em previsões, calendário, divisão e lembretes</p>
+            </div>
+          </div>
+          <div class="config-body">
+            <div class="config-label-row">
+              <span class="config-sublabel">Como você recebe?</span>
+            </div>
+            <div class="wizard-options wizard-options-2col" id="cfg-recebimento-options" style="max-width:420px">
+              <button type="button" class="wizard-card" data-value="unico">
+                <span class="wizard-card-icone">📅</span>
+                <span class="wizard-card-label">Apenas 1 dia por mês</span>
+              </button>
+              <button type="button" class="wizard-card" data-value="multiplo">
+                <span class="wizard-card-icone">🗓️</span>
+                <span class="wizard-card-label">Dividido em 2 ou mais dias</span>
+              </button>
+            </div>
+
+            <div class="wizard-sub-block" id="cfg-dia-unico-block" style="display:none;max-width:420px;margin-top:12px">
+              <div class="input-group">
+                <label>Dia do recebimento</label>
+                <input type="number" id="cfg-dia-unico" min="1" max="31" placeholder="Ex: 5" />
+              </div>
+            </div>
+
+            <div class="wizard-sub-block" id="cfg-dias-multiplos-block" style="display:none;max-width:420px;margin-top:12px">
+              <div class="input-group">
+                <label>Dias de recebimento</label>
+                <div class="wizard-dia-add-row">
+                  <input type="number" id="cfg-dia-novo" min="1" max="31" placeholder="Ex: 20" />
+                  <button type="button" class="btn-secondary" id="cfg-dia-add-btn" onclick="adicionarDiaRecebimentoConfig()">+ Adicionar dia</button>
+                </div>
+              </div>
+              <div class="wizard-dias-chips" id="cfg-dias-chips"></div>
+            </div>
+
+            <div class="config-row" style="margin-top:16px">
+              <button type="button" class="config-save-btn" onclick="salvarDiaRecebimentoConfig()">Salvar dia de recebimento</button>
+            </div>
+            <div id="cfg-recebimento-msg" class="cfg-msg"></div>
+          </div>
+        </div>
+
+        <!-- APARÊNCIA -->
+        <div class="config-section" id="config-aparencia">
+          <div class="config-section-header">
+            <div class="config-section-icon" style="background:rgba(155,114,232,0.12);color:var(--purple)">
+              <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            </div>
+            <div>
+              <h3>Aparência</h3>
+              <p>Personalize as cores e o visual do app</p>
+            </div>
+          </div>
+          <div class="config-body">
+            <div class="config-label-row">
+              <span class="config-sublabel">Cor de destaque (accent)</span>
+              <span class="config-sublabel-hint" id="cfg-accent-hex">#f0c040</span>
+            </div>
+            <div class="cfg-color-presets" id="cfg-presets-accent">
+              <button class="cfg-preset active" data-var="--accent" data-val="#f0c040" style="background:#f0c040" onclick="aplicarPreset(this)"></button>
+              <button class="cfg-preset" data-var="--accent" data-val="#4d9de0" style="background:#4d9de0" onclick="aplicarPreset(this)"></button>
+              <button class="cfg-preset" data-var="--accent" data-val="#3dd68c" style="background:#3dd68c" onclick="aplicarPreset(this)"></button>
+              <button class="cfg-preset" data-var="--accent" data-val="#e05454" style="background:#e05454" onclick="aplicarPreset(this)"></button>
+              <button class="cfg-preset" data-var="--accent" data-val="#9b72e8" style="background:#9b72e8" onclick="aplicarPreset(this)"></button>
+              <button class="cfg-preset" data-var="--accent" data-val="#e8843a" style="background:#e8843a" onclick="aplicarPreset(this)"></button>
+              <button class="cfg-preset" data-var="--accent" data-val="#f472b6" style="background:#f472b6" onclick="aplicarPreset(this)"></button>
+              <button class="cfg-preset" data-var="--accent" data-val="#34d399" style="background:#34d399" onclick="aplicarPreset(this)"></button>
+              <label class="cfg-preset cfg-preset-custom" title="Cor personalizada">
+                <input type="color" id="cfg-accent-picker" value="#f0c040" oninput="aplicarCorCustom('--accent', this)" />
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </label>
+            </div>
+
+            <div class="config-divider"></div>
+
+            <div class="config-label-row" style="margin-top:4px">
+              <span class="config-sublabel">Tema de fundo</span>
+            </div>
+            <div class="cfg-theme-grid cfg-themes-grid" id="cfg-theme-grid">
+              <!-- Escuros -->
+              <div class="cfg-theme-section-label">🌙 Temas Escuros</div>
+              <button class="cfg-theme-card active" data-theme="dark" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#0d0f14;border-color:#252935">
+                  <div style="background:#13161d;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#1a1e27;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span>Escuro</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="darker" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#080a0e;border-color:#1a1e27">
+                  <div style="background:#0e1118;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#141820;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span>Preto</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="slate" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#0f172a;border-color:#1e293b">
+                  <div style="background:#1e293b;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#334155;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span>Ardósia</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="forest" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#0a110d;border-color:#1a2e20">
+                  <div style="background:#111f16;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#1e3528;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span>Floresta</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="ocean" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#060d1a;border-color:#0d1f35">
+                  <div style="background:#0d1f35;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#162d4a;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span>Oceano</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="wine" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#110810;border-color:#2a1228">
+                  <div style="background:#1a0e1a;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#261426;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span>Vinho</span>
+              </button>
+              <!-- Claros -->
+              <div class="cfg-theme-section-label" style="margin-top:8px">☀️ Temas Claros</div>
+              <button class="cfg-theme-card" data-theme="white" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#f8f9fb;border-color:#dde0ea">
+                  <div style="background:#ffffff;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#eef0f5;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span style="color:#111318">☀️ Branco</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="light" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#eef1f7;border-color:#c8d0e4">
+                  <div style="background:#f8faff;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#dde3f0;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span style="color:#181c2e">🌤 Claro</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="beige" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#f5f0e8;border-color:#cfc4a4">
+                  <div style="background:#fdfaf4;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#e8dfc8;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span style="color:#2a2218">🍞 Bege</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="nordic" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#dfe4ef;border-color:#adb8d0">
+                  <div style="background:#edf0f8;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#cdd5e5;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span style="color:#1c2235">🧊 Nordic</span>
+              </button>
+              <button class="cfg-theme-card" data-theme="rose" onclick="aplicarTema(this)">
+                <div class="cfg-theme-preview" style="background:#faeef0;border-color:#e8b0ba">
+                  <div style="background:#fff8f9;border-radius:4px;width:60%;height:8px;margin-bottom:5px"></div>
+                  <div style="background:#f5d8dc;border-radius:4px;width:40%;height:6px"></div>
+                </div>
+                <span style="color:#2a0d12">🌸 Rosa</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- BACKUP -->
+        <div class="config-section" id="config-backup">
+          <div class="config-section-header">
+            <div class="config-section-icon" style="background:rgba(61,214,140,0.12);color:var(--green)">
+              <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+            </div>
+            <div>
+              <h3>Backup de Dados</h3>
+              <p>Exporte e importe todos os seus dados</p>
+            </div>
+          </div>
+          <div class="config-body">
+            <div class="cfg-backup-grid">
+              <div class="cfg-backup-card">
+                <div class="cfg-backup-card-icon" style="color:var(--green)">
+                  <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                </div>
+                <h4>Exportar JSON</h4>
+                <p>Baixe todos os seus dados em formato JSON. Use para guardar um backup ou migrar para outro dispositivo.</p>
+                <button type="button" class="config-save-btn config-save-btn-green" onclick="exportarBackup()">
+                  <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                  Exportar backup
+                </button>
+              </div>
+              <div class="cfg-backup-card">
+                <div class="cfg-backup-card-icon" style="color:var(--blue)">
+                  <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 11v4H10v-4H7l5-5 5 5h-3z"/></svg>
+                </div>
+                <h4>Importar JSON</h4>
+                <p>Restaure um backup salvo anteriormente. <strong style="color:var(--red)">Atenção:</strong> isso substituirá todos os dados atuais.</p>
+                <label class="config-save-btn config-save-btn-blue" style="cursor:pointer">
+                  <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 11v4H10v-4H7l5-5 5 5h-3z"/></svg>
+                  Importar backup
+                  <input type="file" accept=".json" style="display:none" onchange="importarBackup(this)" />
+                </label>
+              </div>
+            </div>
+            <div id="cfg-backup-msg" class="cfg-msg" style="margin-top:12px"></div>
+            <div class="config-divider" style="margin-top:16px"></div>
+            <div class="config-label-row" style="margin-top:8px">
+              <span class="config-sublabel">💾 Backup Automático</span>
+              <span style="font-size:12px;color:var(--text3)">Salvo a cada ação importante</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <p style="font-size:13px;color:var(--text2);flex:1;min-width:200px;line-height:1.6">O app salva automaticamente snapshots locais a cada gasto, salário ou meta registrada. Baixe o mais recente abaixo.</p>
+              <button type="button" class="config-save-btn" onclick="exportarBackupAuto(0)">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                Baixar backup automático
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DADOS DA CONTA -->
+        <div class="config-section" id="config-conta">
+          <div class="config-section-header">
+            <div class="config-section-icon" style="background:rgba(224,84,84,0.12);color:var(--red)">
+              <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+            </div>
+            <div>
+              <h3>Conta & Segurança</h3>
+              <p>Informações da sua conta</p>
+            </div>
+          </div>
+          <div class="config-body">
+            <div class="cfg-conta-info">
+              <div class="cfg-conta-row">
+                <span class="cfg-conta-label">E-mail</span>
+                <span class="cfg-conta-val" id="cfg-email-val">—</span>
+              </div>
+              <div class="cfg-conta-row">
+                <span class="cfg-conta-label">UID</span>
+                <span class="cfg-conta-val cfg-conta-uid" id="cfg-uid-val">—</span>
+              </div>
+              <div class="cfg-conta-row">
+                <span class="cfg-conta-label">Conta criada</span>
+                <span class="cfg-conta-val" id="cfg-criado-val">—</span>
+              </div>
+              <div class="cfg-conta-row">
+                <span class="cfg-conta-label">Último acesso</span>
+                <span class="cfg-conta-val" id="cfg-ultimo-val">—</span>
+              </div>
+            </div>
+            <div class="config-divider"></div>
+            <div class="cfg-danger-zone">
+              <p class="cfg-danger-label">Zona de perigo</p>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+                <button type="button" class="config-save-btn config-save-btn-red" onclick="confirmarLimparDados()">
+                  <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                  Limpar todos os dados
+                </button>
+                <button type="button" class="config-save-btn config-save-btn-red" style="background:rgba(180,20,20,0.18);border:1.5px solid rgba(224,84,84,0.5)" onclick="confirmarExcluirConta()">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/></svg>
+                  Excluir minha conta
+                </button>
+              </div>
+              <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">⚠️ <b>Excluir conta</b>: apaga todos os dados e remove o acesso permanentemente. Será solicitado seu PIN de segurança.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- =================== MODAL ADICIONAR =================== -->
+<div id="modal-overlay" class="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Adicionar Gasto</h3>
+      <button type="button" class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <label>Categoria</label>
+        <select id="m-cat" onchange="toggleParcelas()">
+          <option>Alimentação</option>
+          <option>Compras parceladas</option>
+          <option>Compras recorrentes</option>
+          <option>Compras futuras</option>
+          <option>Roupas e calçados</option>
+          <option>Lazer</option>
+          <option>Auto-cuidado</option>
+          <option>Transporte</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Valor total (R$)</label>
+        <input type="number" id="m-valor" placeholder="0,00" min="0" step="0.01"/>
+      </div>
+      <div class="input-group" id="parcelas-group" style="display:none">
+        <label>Número de parcelas</label>
+        <input type="number" id="m-parcelas" placeholder="ex: 12" min="1" max="60"/>
+      </div>
+      <div class="input-group" id="cartao-group" style="display:none">
+        <label id="cartao-label">Cartão utilizado</label>
+        <select id="m-cartao" onchange="aoEscolherCartaoGasto()"></select>
+      </div>
+      <div class="input-group" id="vencimento-group" style="display:none">
+        <label id="vencimento-label">Dia de vencimento da fatura</label>
+        <input type="number" id="m-vencimento" placeholder="ex: 10 (dia do mês)" min="1" max="31" oninput="atualizarHintDivisivel()"/>
+      </div>
+      <div id="divisivel-group" style="display:none;flex-direction:column;gap:10px;margin-bottom:4px">
+        <label style="font-size:13px;font-weight:600;color:var(--text2)">Entra na Divisão 15/30?</label>
+        <div style="display:flex;gap:8px">
+          <button type="button" id="divisivel-btn-sim" onclick="setDivisivel(true)"
+            style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:13px;font-family:var(--font-body);transition:all 0.18s">
+            ✂️ Sim, dividir 15/30
+          </button>
+          <button type="button" id="divisivel-btn-nao" onclick="setDivisivel(false)"
+            style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:13px;font-family:var(--font-body);transition:all 0.18s">
+            📅 Não, só no vencimento
+          </button>
+        </div>
+        <p id="divisivel-hint" style="font-size:12px;color:var(--text3);margin:0;line-height:1.5;padding:0 2px"></p>
+      </div>
+      <div class="input-group" id="data-group">
+        <label>Data da compra</label>
+        <input type="date" id="m-data" oninput="validarData()" />
+      </div>
+      <div id="data-error" class="data-error-msg" style="display:none">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span id="data-error-text"></span>
+      </div>
+      <div class="input-group">
+        <label id="loja-label">Loja / Estabelecimento</label>
+        <input type="text" id="m-loja" placeholder="ex: Shopee, Mercado..." />
+      </div>
+      <div class="input-group" id="desc-group">
+        <label>Descrição (opcional)</label>
+        <input type="text" id="m-desc" placeholder="O que foi?" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button type="button" class="btn-primary" onclick="salvarGasto()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MODAL PARCELAS =================== -->
+<div id="modal-parcelas" class="modal-overlay" onclick="if(event.target===this)fecharModalParcelas()">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <h3 id="mp-titulo">Parcelas</h3>
+      <button type="button" class="modal-close" onclick="fecharModalParcelas()">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:8px">
+      <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Clique no checkbox para marcar uma parcela como paga. A data de pagamento é registrada automaticamente.</p>
+      <div id="mp-lista" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-primary" onclick="fecharModalParcelas()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- =================== MODAL COMPRA FUTURA =================== -->
+<div id="modal-futura" class="modal-overlay" onclick="if(event.target===this)fecharModalFutura()">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <h3 id="mf-titulo">Compra Futura</h3>
+      <button type="button" class="modal-close" onclick="fecharModalFutura()">✕</button>
+    </div>
+    <div class="modal-body" id="mf-body"></div>
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" onclick="fecharModalFutura()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MODAL PARCELADOS PAGOS =================== -->
+<div id="modal-parcelados-pagos" class="modal-overlay" onclick="if(event.target===this)fecharModalParceladosPagos()">
+  <div class="modal parcelados-pagos-modal">
+    <div class="modal-header">
+      <h3>Gastos parcelados pagos</h3>
+      <button type="button" class="modal-close" onclick="fecharModalParceladosPagos()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="parcelados-pagos-filtros">
+        <div class="input-group">
+          <label>Data inicial</label>
+          <input type="date" id="pagos-start" onchange="aoFiltrarPagos()" />
+        </div>
+        <div class="input-group">
+          <label>Data final</label>
+          <input type="date" id="pagos-end" onchange="aoFiltrarPagos()" />
+        </div>
+        <button type="button" class="filter-clear-btn" onclick="limparFiltroPagos()">Limpar</button>
+      </div>
+      <div class="input-group" style="margin-top:8px">
+        <input type="text" id="pagos-busca" placeholder="🔍 Buscar por loja ou cartão..." oninput="aoFiltrarPagos()" />
+      </div>
+      <div class="parcelados-pagos-total-row">
+        <span>Total quitado no filtro:</span>
+        <span id="parcelados-pagos-total">R$ 0,00</span>
+      </div>
+      <div id="parcelados-pagos-list" class="parcelados-pagos-list"></div>
+      <div id="parcelados-pagos-paginacao" class="parcelados-pagos-paginacao"></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MODAL CROP FOTO DE PERFIL =================== -->
+<div id="modal-crop-foto" class="modal-overlay" onclick="if(event.target===this)fecharCropFoto()">
+  <div class="modal crop-modal">
+    <div class="modal-header">
+      <h3>Ajustar foto de perfil</h3>
+      <button type="button" class="modal-close" onclick="fecharCropFoto()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="crop-canvas-wrap" id="crop-canvas-wrap">
+        <canvas id="crop-canvas" width="320" height="320"></canvas>
+      </div>
+      <div class="crop-zoom-row">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="range" id="crop-zoom" min="1" max="3" step="0.01" value="1">
+      </div>
+      <p class="crop-hint">Arraste para reposicionar e use o controle para dar zoom.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" onclick="fecharCropFoto()">Cancelar</button>
+      <button type="button" class="btn-primary" id="crop-confirmar-btn" onclick="confirmarCropFoto()">Salvar foto</button>
+    </div>
+  </div>
+</div>
+
+<!-- defer em todos: mantém a ordem de execução relativa entre eles (igual
+     ao comportamento atual, pois já estão no fim do body), mas libera o
+     parser/pintura inicial da página em vez de bloquear até cada um
+     terminar de baixar+executar. Reduz o tempo até a tela ficar visível,
+     especialmente em conexões mais lentas. -->
+<script src="js/utils.js" defer></script>
+<script type="module" src="js/firebase.js"></script>
+<script src="js/financeiro.js" defer></script>
+<script src="js/dashboard.js" defer></script>
+<script src="js/perfil.js" defer></script>
+<script src="js/cadastro.js" defer></script>
+<script src="js/app.js" defer></script>
+</body>
+</html>

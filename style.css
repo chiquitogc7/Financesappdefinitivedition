@@ -1,0 +1,977 @@
+/* ==============================================================
+   FINANCESAPP — STYLE.CSS
+Variaveis globais, reset, layout base (sidebar/topbar/main),
+botoes, inputs, modais e componentes reutilizaveis, temas e utilidades.
+Carregar SEMPRE primeiro.
+   ============================================================== */
+
+
+:root {
+  --bg: #0d0f14;
+  --bg2: #13161d;
+  --bg3: #1a1e27;
+  --border: #252935;
+  --accent: #f0c040;
+  --accent-contrast: #0d0f14;
+  --accent2: #e8843a;
+  --green: #3dd68c;
+  --red: #e05454;
+  --blue: #4d9de0;
+  --purple: #9b72e8;
+  --text: #f0f2f8;
+  --text2: #8b92a8;
+  --text3: #545c74;
+  --radius: 14px;
+  --shadow: 0 4px 32px rgba(0,0,0,0.4);
+  --font-head: 'Outfit', sans-serif;
+  --font-body: 'Manrope', sans-serif;
+  --sidebar-w: 220px;
+  --sidebar-w-collapsed: 68px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+
+/* ------------------------------------------------------------
+   ============ INPUTS ============
+   ------------------------------------------------------------ */
+
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+
+.input-group label {
+  font-size: 12px; font-weight: 500; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.input-group input,
+.input-group select {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: var(--font-body); font-size: 15px;
+  padding: 11px 14px; outline: none; transition: border-color 0.2s; width: 100%;
+}
+
+.input-group input:focus,
+.input-group select:focus { border-color: var(--accent); }
+.input-group select option { background: var(--bg3); }
+
+
+/* ------------------------------------------------------------
+   ============ BOTÕES ============
+   ------------------------------------------------------------ */
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  border: none; border-radius: 10px; color: #0d0f14;
+  cursor: pointer; font-family: var(--font-head); font-size: 15px;
+  font-weight: 700; padding: 13px 24px; width: 100%;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text2); cursor: pointer;
+  font-family: var(--font-body); font-size: 15px; padding: 13px 24px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-secondary:hover { border-color: var(--text3); color: var(--text); }
+
+
+/* ------------------------------------------------------------
+   ============ APP LAYOUT ============
+   ------------------------------------------------------------ */
+
+#app { display: flex; min-height: 100vh; }
+
+
+/* ------------------------------------------------------------
+   ============ SIDEBAR ============
+   ------------------------------------------------------------ */
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 28px 16px; position: fixed; top: 0; left: 0;
+  height: 100vh; z-index: 100; overflow-y: auto;
+}
+
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 28px; padding: 0 8px;
+  font-family: var(--font-head); font-size: 18px; color: var(--text);
+}
+
+.sidebar-logo .logo-icon { width: 36px; height: 36px; flex-shrink: 0; }
+
+nav { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; color: var(--text2);
+  cursor: pointer; font-size: 13px; font-weight: 500;
+  transition: background 0.2s, color 0.2s; text-decoration: none; user-select: none;
+}
+.nav-item svg { width: 17px; height: 17px; fill: currentColor; flex-shrink: 0; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(240,192,64,0.12); color: var(--accent); }
+
+.sidebar-footer { margin-top: auto; padding-top: 16px; }
+
+.btn-logout {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text3); cursor: pointer; font-size: 13px;
+  padding: 10px 14px; width: 100%; transition: border-color 0.2s, color 0.2s;
+}
+.btn-logout svg { width: 16px; height: 16px; fill: currentColor; }
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+
+/* ------------------------------------------------------------
+   ============ MAIN ============
+   ------------------------------------------------------------ */
+
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: calc(100vw - var(--sidebar-w));
+  box-sizing: border-box;
+}
+
+
+/* ------------------------------------------------------------
+   ============ TOPBAR ============
+   ------------------------------------------------------------ */
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 32px; border-bottom: 1px solid var(--border);
+  background: var(--bg2); position: sticky; top: 0; z-index: 50;
+}
+
+.topbar h2 { font-family: var(--font-head); font-size: 22px; font-weight: 800; }
+.tab-sub { font-size: 13px; color: var(--text2); display: block; margin-top: 2px; }
+
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+
+
+/* ------------------------------------------------------------
+   ============ RELÓGIO ============
+   ------------------------------------------------------------ */
+
+.relogio-box {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 8px 16px; text-align: right; line-height: 1.2;
+}
+.relogio-hora { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--accent); letter-spacing: 0.05em; }
+.relogio-data { font-size: 11px; color: var(--text2); margin-top: 2px; letter-spacing: 0.03em; }
+
+.btn-add {
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; border-radius: 10px; color: var(--accent-contrast);
+  cursor: pointer; font-family: var(--font-head); font-size: 14px;
+  font-weight: 700; padding: 11px 20px;
+  transition: opacity 0.2s, transform 0.15s; white-space: nowrap;
+}
+.btn-add svg { width: 18px; height: 18px; fill: currentColor; }
+.btn-add:hover { opacity: 0.88; transform: translateY(-1px); }
+
+
+/* ------------------------------------------------------------
+   ============ TAB CONTENT ============
+   ------------------------------------------------------------ */
+
+.tab-content { display: none; padding: 32px; }
+.tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ------------------------------------------------------------
+   ============ MODAL ============
+   ------------------------------------------------------------ */
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px); display: none;
+  align-items: center; justify-content: center; z-index: 200;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 20px; width: 100%; max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: slideUp 0.25s ease; max-height: 90vh; overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 24px 28px 0; }
+.modal-header h3 { font-family: var(--font-head); font-size: 20px; font-weight: 800; }
+
+.modal-close {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text2); cursor: pointer;
+  font-size: 14px; padding: 6px 10px; transition: background 0.2s;
+}
+.modal-close:hover { background: var(--border); color: var(--text); }
+
+.modal-body { display: flex; flex-direction: column; gap: 16px; padding: 24px 28px; }
+.modal-footer { display: flex; gap: 12px; padding: 0 28px 24px; }
+.modal-footer .btn-primary, .modal-footer .btn-secondary { flex: 1; width: auto; }
+
+.data-error-msg {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: rgba(224,84,84,0.1); border: 1px solid rgba(224,84,84,0.3);
+  border-radius: 10px; color: var(--red); font-size: 13px;
+  padding: 10px 14px; line-height: 1.5; margin-top: -8px;
+}
+.data-error-msg svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; margin-top: 1px; }
+
+
+/* ------------------------------------------------------------
+   ============ TOAST ============
+   ------------------------------------------------------------ */
+
+.toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 12px; color: var(--text); font-size: 14px;
+  padding: 14px 20px; box-shadow: var(--shadow); z-index: 300;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s; pointer-events: none; max-width: 320px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+
+/* ------------------------------------------------------------
+   ============ EMPTY STATE ============
+   ------------------------------------------------------------ */
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty-state svg { width: 48px; height: 48px; fill: var(--text3); margin-bottom: 16px; }
+.empty-state p { font-size: 15px; }
+
+
+/* ------------------------------------------------------------
+   ============ CONFIRMAÇÃO CUSTOMIZADA (melhoria 5) ============
+   ------------------------------------------------------------ */
+
+.confirm-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 500;
+  opacity: 0; transition: opacity 0.2s;
+}
+.confirm-overlay.visible { opacity: 1; }
+
+.confirm-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  width: 100%; max-width: 380px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+  text-align: center;
+  animation: confirmPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes confirmPop {
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.confirm-icon {
+  font-size: 42px;
+  margin-bottom: 14px;
+  display: block;
+  animation: iconBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+@keyframes iconBounce {
+  from { transform: scale(0) rotate(-15deg); }
+  to   { transform: scale(1) rotate(0deg); }
+}
+
+.confirm-titulo {
+  font-family: var(--font-head);
+  font-size: 20px; font-weight: 800;
+  color: var(--text); margin-bottom: 10px;
+}
+
+.confirm-msg {
+  font-size: 14px; color: var(--text2);
+  line-height: 1.6; margin-bottom: 24px;
+}
+
+.confirm-footer {
+  display: flex; gap: 10px;
+}
+
+.confirm-btn-cancel {
+  flex: 1; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text2); cursor: pointer;
+  font-family: var(--font-body); font-size: 14px;
+  padding: 12px; transition: border-color 0.2s, color 0.2s;
+}
+.confirm-btn-cancel:hover { border-color: var(--text3); color: var(--text); }
+
+.confirm-btn-ok {
+  flex: 1.5; border: none; border-radius: 10px;
+  cursor: pointer; font-family: var(--font-head);
+  font-size: 14px; font-weight: 700; padding: 12px;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.confirm-btn-ok:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.confirm-btn-danger  { background: linear-gradient(135deg, var(--red), #c03030); color: #fff; }
+.confirm-btn-warning { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #000; }
+.confirm-btn-info    { background: linear-gradient(135deg, var(--blue), var(--purple)); color: #fff; }
+
+
+/* ------------------------------------------------------------
+   ============ HISTÓRICO / UNDO (melhoria 2) ============
+   ------------------------------------------------------------ */
+
+.historico-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: flex-end; justify-content: flex-end;
+  z-index: 400; padding: 24px;
+  opacity: 0; transition: opacity 0.2s;
+}
+.historico-overlay.visible { opacity: 1; }
+
+.historico-painel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%; max-width: 380px;
+  max-height: 500px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: slideInRight 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px) scale(0.96); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.historico-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text);
+  background: var(--bg3);
+}
+
+.historico-undo-btn {
+  background: rgba(240,192,64,0.15);
+  border: 1px solid rgba(240,192,64,0.3);
+  border-radius: 8px; color: var(--accent);
+  cursor: pointer; font-size: 12px; font-weight: 600;
+  padding: 6px 12px; transition: background 0.2s;
+}
+.historico-undo-btn:hover { background: rgba(240,192,64,0.25); }
+
+.historico-close {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text2); cursor: pointer;
+  font-size: 13px; padding: 5px 9px; transition: background 0.2s;
+}
+.historico-close:hover { background: var(--border); }
+
+.historico-lista {
+  overflow-y: auto; flex: 1;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.historico-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+  animation: fadeIn 0.2s ease both;
+}
+.historico-item-ico { font-size: 18px; flex-shrink: 0; }
+.historico-item-info { flex: 1; min-width: 0; }
+.historico-item-desc { font-size: 13px; color: var(--text); font-weight: 500; }
+.historico-item-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* Botão de undo / histórico na topbar */
+.btn-undo {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text2);
+  cursor: pointer; font-family: var(--font-body); font-size: 13px;
+  padding: 10px 14px; position: relative;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.btn-undo:hover { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,0.06); }
+.btn-undo svg { width: 16px; height: 16px; fill: currentColor; }
+
+#undo-badge {
+  position: absolute; top: -5px; right: -5px;
+  background: var(--accent); color: #000;
+  font-size: 10px; font-weight: 800;
+  border-radius: 50%; width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head);
+}
+
+
+/* ------------------------------------------------------------
+   TOAST (extra - pointer-events)
+   ------------------------------------------------------------ */
+#toast { pointer-events: auto; }
+#toast.show { pointer-events: auto; }
+
+
+/* ------------------------------------------------------------
+   ============ SIDEBAR TOGGLE — redesign premium ============
+   ------------------------------------------------------------ */
+
+
+/* Smooth sidebar transitions — upgraded */
+.sidebar {
+  transition:
+    width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    padding 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    min-width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease;
+}
+.sidebar .sidebar-logo,
+.sidebar nav,
+.sidebar .sidebar-footer {
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+.main-content {
+  transition:
+    margin-left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Collapsed sidebar — mantém ícones visíveis, esconde apenas os textos */
+#sidebar.collapsed {
+  width: var(--sidebar-w-collapsed) !important;
+  min-width: var(--sidebar-w-collapsed) !important;
+  overflow-x: visible;
+  padding: 28px 0 !important;
+}
+#sidebar.collapsed .sidebar-logo,
+#sidebar.collapsed nav,
+#sidebar.collapsed .sidebar-footer {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+#sidebar.collapsed .sidebar-logo { justify-content: center; padding: 0; }
+#sidebar.collapsed .nav-item { justify-content: center; padding: 10px 0; }
+#sidebar.collapsed .btn-logout { justify-content: center; padding: 10px 0; }
+#sidebar.collapsed .sidebar-user { justify-content: center; padding: 8px 0; }
+#sidebar.collapsed .nav-label {
+  opacity: 0;
+  width: 0;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Toggle button — pill flutuante — upgraded */
+.sidebar-toggle-btn {
+  position: fixed;
+  top: 50%;
+  left: var(--sidebar-w);
+  transform: translateY(-50%) translateX(-50%);
+  z-index: 200;
+
+  /* pill vertical */
+  width: 22px;
+  height: 60px;
+  border-radius: 0 12px 12px 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  transition:
+    left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    height 0.3s ease,
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.25s ease,
+    border-radius 0.3s ease;
+
+  box-shadow: 3px 0 18px rgba(0,0,0,0.28), 0 0 0 0 rgba(240,192,64,0);
+}
+
+/* Chevron icon inside toggle */
+.sidebar-toggle-btn .toggle-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sidebar-toggle-btn .toggle-line {
+  width: 2px;
+  background: var(--text3);
+  border-radius: 2px;
+  transition: height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, transform 0.3s ease;
+}
+.sidebar-toggle-btn .toggle-line-top    { height: 10px; transform-origin: bottom center; }
+.sidebar-toggle-btn .toggle-line-bottom { height: 10px; transform-origin: top center; }
+
+/* Hover state */
+.sidebar-toggle-btn:hover {
+  width: 28px;
+  height: 68px;
+  background: var(--bg3);
+  border-color: var(--accent);
+  box-shadow: 5px 0 24px rgba(240,192,64,0.2), 0 0 0 3px rgba(240,192,64,0.06);
+}
+.sidebar-toggle-btn:hover .toggle-line {
+  background: var(--accent);
+  height: 12px;
+}
+
+/* Active click feedback */
+.sidebar-toggle-btn:active {
+  width: 20px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+}
+
+/* Rotated (collapsed) state — arrow flips with spring */
+.sidebar-toggle-btn.rotated .toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* When collapsed, button moves to left edge */
+#sidebar.collapsed + .sidebar-toggle-btn {
+  left: 0;
+  transform: translateY(-50%) translateX(0);
+  border-radius: 0 12px 12px 0;
+}
+
+/* Pulse animation on first load — more elaborate */
+@keyframes togglePulse {
+  0%   { box-shadow: 3px 0 18px rgba(0,0,0,0.28), 0 0 0 0 rgba(240,192,64,0); }
+  40%  { box-shadow: 5px 0 24px rgba(240,192,64,0.25), 0 0 0 6px rgba(240,192,64,0.06); }
+  70%  { box-shadow: 3px 0 18px rgba(0,0,0,0.2), 0 0 0 10px rgba(240,192,64,0.02); }
+  100% { box-shadow: 3px 0 18px rgba(0,0,0,0.28), 0 0 0 0 rgba(240,192,64,0); }
+}
+.sidebar-toggle-btn.pulse {
+  animation: togglePulse 1.4s ease 0.8s 2;
+}
+
+.no-transition,
+.no-transition * { transition: none !important; }
+
+/* ------------------------------------------------------------
+   1) MOSTRAR SENHA
+   ------------------------------------------------------------ */
+.senha-wrapper { position: relative; display: flex; }
+.senha-wrapper input { padding-right: 42px !important; width: 100%; }
+
+.senha-toggle-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text3);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+.senha-toggle-btn:hover { color: var(--text); background: var(--bg3); }
+.senha-toggle-btn:active { transform: translateY(-50%) scale(0.88); }
+.senha-toggle-btn svg {
+  width: 18px; height: 18px; fill: none; stroke: currentColor;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.senha-toggle-btn.animando svg { opacity: 0; transform: scale(0.6); }
+
+/* Foco visível também no wrapper, para acessibilidade */
+.senha-toggle-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------
+   3) TOOLTIP DA SIDEBAR MINIMIZADA
+   ------------------------------------------------------------ */
+#sidebar.collapsed .nav-item,
+#sidebar.collapsed .btn-logout,
+#sidebar.collapsed .sidebar-user,
+#sidebar.collapsed .sidebar-logo {
+  position: relative;
+}
+#sidebar.collapsed [data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 300;
+}
+#sidebar.collapsed [data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Transição suave do texto ao (des)colapsar */
+.nav-label {
+  transition: opacity 0.25s ease, width 0.25s ease, margin 0.25s ease;
+  display: inline-block;
+}
+
+/* ------------------------------------------------------------
+   12) FOTO DE PERFIL — avatar em Configurações
+   ------------------------------------------------------------ */
+.sidebar-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; margin-bottom: 8px;
+  border-radius: 10px; cursor: pointer;
+  transition: background 0.2s ease;
+}
+.sidebar-user:hover { background: var(--bg3); }
+.sidebar-user-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--bg3); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+  font-size: 12px; font-weight: 700; color: var(--accent);
+}
+.sidebar-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sidebar-user-nome {
+  font-size: 12.5px; color: var(--text2); font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ------------------------------------------------------------
+   MODAL DE RECORTE DE FOTO
+   ------------------------------------------------------------ */
+.lista-otimizada {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
+}
+
+/* ------------------------------------------------------------
+   6) INSIGHTS BLOQUEADOS (< R$100 acumulados)
+   ------------------------------------------------------------ */
+#lembretes-sino-wrap { align-items: center; }
+
+#lembretes-sino-btn {
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+#lembretes-sino-btn:hover { border-color: var(--accent); color: var(--text); }
+#lembretes-sino-btn:active { transform: scale(0.94); }
+
+#lembretes-sino-dropdown { animation: fadeIn 0.18s ease; }
+
+#lembretes-lista::-webkit-scrollbar { width: 6px; }
+#lembretes-lista::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+
+/* ------------------------------------------------------------
+   TEMAS (temas claros + variaveis)
+   ------------------------------------------------------------ */
+:root {
+  --theme-transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  --sidebar-bg:   var(--bg2);
+  --card-bg:      var(--bg2);
+  --input-bg:     var(--bg3);
+  --topbar-bg:    var(--bg2);
+  --modal-bg:     var(--bg2);
+  --hover-bg:     var(--bg3);
+  --shadow-color: rgba(0,0,0,0.4);
+  --accent-contrast-auto: var(--accent-contrast);
+}
+
+body, .sidebar, .main-content, .topbar,
+.card, .chart-box, .modal, .login-card,
+.gasto-item, .parcelado-item, .recorrente-item,
+.extrato-dia, .extrato-item, .cal-cell,
+.config-section, .widget-modular, .pag-item,
+.cartao-item, .meta-item, .salario-hist-item,
+.historico-painel, .confirm-modal, .customizar-modal,
+.ciclo-card, .div-card, .div-breakdown,
+.mp-row, .filter-row select, .filter-row input,
+.input-group input, .input-group select,
+.nav-item, .btn-logout, .btn-primary, .btn-secondary,
+.toast, .cfg-backup-card, .cfg-theme-card {
+  transition: var(--theme-transition);
+}
+
+/* ══════════════════════════════════════════════════════════
+   2. TEMAS CLAROS
+   ══════════════════════════════════════════════════════════ */
+
+[data-theme="white"] {
+  --bg:#f8f9fb;--bg2:#ffffff;--bg3:#eef0f5;--border:#dde0ea;
+  --text:#111318;--text2:#4a5068;--text3:#8890a8;--shadow-color:rgba(0,0,0,0.08);
+  --sidebar-bg:#ffffff;--card-bg:#ffffff;--input-bg:#f0f2f8;
+  --topbar-bg:#ffffff;--modal-bg:#ffffff;--hover-bg:#eef0f5;
+  --accent-contrast:#ffffff;--accent-contrast-auto:#0d0f14;
+}
+[data-theme="light"] {
+  --bg:#eef1f7;--bg2:#f8faff;--bg3:#dde3f0;--border:#c8d0e4;
+  --text:#181c2e;--text2:#404870;--text3:#8090b8;--shadow-color:rgba(0,0,0,0.1);
+  --sidebar-bg:#f8faff;--card-bg:#f8faff;--input-bg:#dde3f0;
+  --topbar-bg:#f8faff;--modal-bg:#f8faff;--hover-bg:#dde3f0;--accent-contrast-auto:#0d0f14;
+}
+[data-theme="beige"] {
+  --bg:#f5f0e8;--bg2:#fdfaf4;--bg3:#e8dfc8;--border:#cfc4a4;
+  --text:#2a2218;--text2:#5a4e38;--text3:#9a8e78;--shadow-color:rgba(60,40,0,0.1);
+  --sidebar-bg:#fdfaf4;--card-bg:#fdfaf4;--input-bg:#e8dfc8;
+  --topbar-bg:#fdfaf4;--modal-bg:#fdfaf4;--hover-bg:#e8dfc8;--accent-contrast-auto:#0d0f14;
+}
+[data-theme="nordic"] {
+  --bg:#dfe4ef;--bg2:#edf0f8;--bg3:#cdd5e5;--border:#adb8d0;
+  --text:#1c2235;--text2:#3d4a6a;--text3:#7888aa;--shadow-color:rgba(0,0,50,0.1);
+  --sidebar-bg:#edf0f8;--card-bg:#edf0f8;--input-bg:#cdd5e5;
+  --topbar-bg:#edf0f8;--modal-bg:#edf0f8;--hover-bg:#cdd5e5;--accent-contrast-auto:#0d0f14;
+}
+[data-theme="rose"] {
+  --bg:#faeef0;--bg2:#fff8f9;--bg3:#f5d8dc;--border:#e8b0ba;
+  --text:#2a0d12;--text2:#6a2035;--text3:#b07088;--shadow-color:rgba(80,0,20,0.08);
+  --sidebar-bg:#fff8f9;--card-bg:#fff8f9;--input-bg:#f5d8dc;
+  --topbar-bg:#fff8f9;--modal-bg:#fff8f9;--hover-bg:#f5d8dc;--accent-contrast-auto:#0d0f14;
+}
+
+/* ══════════════════════════════════════════════════════════
+   3. APLICAÇÃO DAS VARIÁVEIS NOS COMPONENTES
+   ══════════════════════════════════════════════════════════ */
+
+.sidebar          { background: var(--sidebar-bg) !important; }
+.topbar           { background: var(--topbar-bg)  !important; }
+.card             { background: var(--card-bg)    !important; }
+.modal            { background: var(--modal-bg)   !important; }
+.login-card       { background: var(--modal-bg)   !important; }
+.confirm-modal    { background: var(--modal-bg)   !important; }
+.historico-painel { background: var(--modal-bg)   !important; }
+.customizar-modal { background: var(--modal-bg)   !important; }
+.resumo-mes-modal { background: var(--modal-bg)   !important; }
+.mobile-nav-dropdown { background: var(--modal-bg) !important; border-color: var(--border) !important; }
+
+.input-group input,.input-group select,
+.filter-row select,.filter-row input,
+.meta-input,.mp-val-input,
+.mp-adiantar-field input,.mp-adiantar-field select,
+#div-mes-select { background: var(--input-bg) !important; }
+
+.chart-box,.insights-wrapper,.explicador-wrapper,
+.ciclo-wrapper,.config-section,.cfg-backup-card,
+.gasto-item,.parcelado-item,.recorrente-item,
+.extrato-dia,.cartao-item,.sal-bloco,.sal-extra-box,
+.meta-item,.salario-hist-item,.pag-item,.div-card,
+.div-breakdown,.parcelados-atrasos-card,.parcelados-pagos-box,
+.widget-modular,.ciclo-card,.extrato-item { background: var(--card-bg) !important; }
+
+.historico-item,.recorrente-icon,.cal-cell,.cfg-theme-card,
+.mp-row,.parcelado-pago-item,.atraso-item,
+.semana-bar-wrap { background: var(--hover-bg) !important; }
+
+.nav-item:hover       { background: var(--hover-bg) !important; }
+.cfg-conta-row:hover  { background: var(--hover-bg) !important; }
+.mobile-nav-item:hover,.mobile-nav-item:active { background: var(--hover-bg) !important; }
+
+.card,.modal,.login-card,.sidebar { box-shadow: 0 4px 32px var(--shadow-color); }
+
+[data-theme="white"] #login-screen,[data-theme="light"] #login-screen,
+[data-theme="beige"] #login-screen,[data-theme="nordic"] #login-screen,
+[data-theme="rose"] #login-screen {
+  background: radial-gradient(ellipse at 20% 80%,rgba(240,192,64,0.06) 0%,transparent 60%),
+              radial-gradient(ellipse at 80% 20%,rgba(77,157,224,0.06) 0%,transparent 60%),var(--bg);
+}
+
+[data-theme="white"] .btn-primary,[data-theme="light"] .btn-primary,
+[data-theme="beige"] .btn-primary,[data-theme="nordic"] .btn-primary,
+[data-theme="rose"] .btn-primary,
+[data-theme="white"] .btn-add,[data-theme="light"] .btn-add,
+[data-theme="beige"] .btn-add,[data-theme="nordic"] .btn-add,
+[data-theme="rose"] .btn-add { color: #0d0f14 !important; }
+
+[data-theme="white"] ::-webkit-scrollbar-track,[data-theme="light"] ::-webkit-scrollbar-track,
+[data-theme="beige"] ::-webkit-scrollbar-track,[data-theme="nordic"] ::-webkit-scrollbar-track,
+[data-theme="rose"] ::-webkit-scrollbar-track { background: var(--bg3); }
+[data-theme="white"] ::-webkit-scrollbar-thumb,[data-theme="light"] ::-webkit-scrollbar-thumb,
+[data-theme="beige"] ::-webkit-scrollbar-thumb,[data-theme="nordic"] ::-webkit-scrollbar-thumb,
+[data-theme="rose"] ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ══════════════════════════════════════════════════════════
+   4. BOTÃO HAMBÚRGUER — completamente desabilitado
+      O menu lateral esquerdo não existe mais no mobile.
+      A navegação é feita apenas pelo botão de grade (canto superior direito).
+   ══════════════════════════════════════════════════════════ */
+
+/* Hamburger escondido em todos os tamanhos */
+
+/* ------------------------------------------------------------
+   NAVEGACAO MOBILE (grade rapida + hamburguer desativado)
+   ------------------------------------------------------------ */
+.mobile-menu-btn {
+  display: none !important;
+}
+
+/* Overlay do drawer também desativado */
+.mobile-overlay {
+  display: none !important;
+}
+
+/* ══════════════════════════════════════════════════════════
+   5. NAVEGAÇÃO RÁPIDA — botão grade (canto direito topbar)
+      Visível apenas em mobile/tablet (≤ 1024px)
+   ══════════════════════════════════════════════════════════ */
+
+.mobile-nav-wrap {
+  display: none;
+  position: relative;
+}
+
+.mobile-nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; border-radius: 10px; color: #0d0f14;
+  cursor: pointer; padding: 9px 11px; flex-shrink: 0;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.mobile-nav-btn:active { transform: scale(0.93); }
+.mobile-nav-btn svg { width: 20px; height: 20px; fill: currentColor; display: block; }
+
+/* Dropdown — oculto por padrão, aparece com .open */
+.mobile-nav-dropdown {
+  display: none;
+  position: fixed;
+  top: 60px;
+  right: 12px;
+  width: 215px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+  z-index: 500;
+  padding: 6px;
+  max-height: calc(100dvh - 80px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Quando aberto */
+.mobile-nav-dropdown.open {
+  display: block;
+  animation: navDropIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes navDropIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.mobile-nav-title {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text3); padding: 6px 10px 8px;
+  border-bottom: 1px solid var(--border); margin-bottom: 4px;
+}
+
+.mobile-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; background: none; border: none;
+  border-radius: 10px; color: var(--text2); cursor: pointer;
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  padding: 10px 10px; text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.mobile-nav-item svg { width: 17px; height: 17px; fill: currentColor; flex-shrink: 0; }
+.mobile-nav-item.active-tab { background: rgba(240,192,64,0.12) !important; color: var(--accent); }
+
+/* ══════════════════════════════════════════════════════════
+   6. DESKTOP GRANDE (> 1280px)
+   ══════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════
+   7. DESKTOP PADRÃO (1025px – 1280px)
+   ══════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════
+   8. TABLET (769px – 1024px)
+      Sidebar sempre visível (mais estreita),
+      botão de grade para navegação rápida
+   ══════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════
+   9. MOBILE (≤ 768px)
+      SEM sidebar. Navegação apenas pelo botão de grade (topo direito).
+      Layout amplo: tela 100% usada, sem margens desnecessárias.
+   ══════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════
+   10. CELULAR PEQUENO (≤ 480px)
+   ══════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════
+   11. SCROLLBAR CUSTOMIZADA (desktop)
+   ══════════════════════════════════════════════════════════ */
+
+
